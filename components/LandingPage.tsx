@@ -79,11 +79,11 @@ const Panel: React.FC<PanelProps> = ({
             style={{
               backgroundImage: `url(${imageUrl})`,
               transitionDuration: isEntrance ? '1500ms' : '200ms',
+              // Scale from 1.15 (entrance) to 1.05 (parallax base)
+              // Parallax effect is always active after entrance
               transform: !isVisible 
-                ? 'scale(1.15)' // Start zoomed in
-                : isHovered && !isEntrance
-                  ? `scale(1.05) translateX(${parallax.x}px) translateY(${parallax.y}px)`
-                  : 'scale(1) translateX(0) translateY(0)',
+                ? 'scale(1.15)' 
+                : `scale(1.05) translateX(${parallax.x}px) translateY(${parallax.y}px)`,
             }}
           >
             <div className={`absolute inset-0 ${bgColor} mix-blend-multiply transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}></div>

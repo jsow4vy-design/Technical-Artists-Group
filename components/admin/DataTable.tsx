@@ -25,6 +25,7 @@ export const DataTable: React.FC<DataTableProps> = ({ title, items, setItems, st
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [filter, searchQuery, sort]);
@@ -48,6 +49,7 @@ export const DataTable: React.FC<DataTableProps> = ({ title, items, setItems, st
       });
   }, [items, sort, filter, statusOptions, searchQuery]);
 
+  // Pagination Calculations
   const totalPages = Math.ceil(filteredAndSortedItems.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;

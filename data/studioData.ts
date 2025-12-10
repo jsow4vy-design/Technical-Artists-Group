@@ -1,3 +1,5 @@
+
+
 export const studioPackages = [
     // Recording & Tracking (5 packages)
     { id: 1, category: "Recording & Tracking", title: "Solo Artist Demo", price: 120, priceDisplay: "$120", details: ["3-hour session", "Vocal & 1 Instrument Setup", "Access to vocal tuning software", "Stereo bounce of raw tracks"], description: "Perfect for singer-songwriters. Bring your own engineer or add one of ours." },
@@ -79,6 +81,71 @@ export const studioFaqs = [
         question: "Do you offer mastering services?",
         answer: "Yes, we do! Our 'In-House Mastering' service is the perfect final touch for your mixed tracks. Our engineers use a hybrid analog and digital chain to ensure your music sounds great on all streaming platforms and playback systems."
     },
+    {
+        id: 6,
+        question: "What payment methods do you accept?",
+        answer: "We accept all major credit cards, bank transfers (ACH), and secure online payments via our booking portal. A 50% deposit is required to lock in your session time, with the remaining balance due upon arrival."
+    },
+    {
+        id: 7,
+        question: "Is the studio wheelchair accessible?",
+        answer: "Yes, our facility is fully accessible on the ground floor, including the main live room, control room A, and restrooms. Please let us know if you have specific accessibility needs so we can ensure a comfortable experience."
+    },
+    {
+        id: 8,
+        question: "How will I receive my files?",
+        answer: "We can transfer files directly to your hard drive at the end of the session (USB 3.0/USB-C recommended). Alternatively, we can provide a secure digital download link (Dropbox/WeTransfer) valid for 30 days after your session."
+    },
+    {
+        id: 9,
+        question: "Can we visit the studio before booking?",
+        answer: "Of course! We offer studio tours by appointment. It's a great way to meet the team, check out the vibe, and see the gear before you commit. Contact us to schedule a walkthrough."
+    },
+    {
+        id: 10,
+        question: "Is there Wi-Fi available?",
+        answer: "Yes, we have high-speed fiber internet (1Gbps up/down) available throughout the studio for client use. It's perfect for downloading reference tracks, uploading content, or livestreaming your session."
+    },
+    {
+        id: 11,
+        question: "Can we eat or drink in the studio?",
+        answer: "Food and drinks are allowed in the lounge and kitchen areas. We ask that only water in sealed containers be brought into the control rooms and live rooms to protect the equipment."
+    },
+    {
+        id: 12,
+        question: "Is there a limit on how many guests I can bring?",
+        answer: "For comfort and safety, we recommend keeping your session to essential personnel. If you expect a group larger than 8 people, please let us know in advance so we can accommodate you."
+    },
+    {
+        id: 13,
+        question: "Do you offer long-term lockouts?",
+        answer: "Yes! We offer discounted rates for weekly or monthly lockouts. This is perfect for album projects where you want to leave your gear set up. Contact us for custom pricing."
+    },
+    {
+        id: 14,
+        question: "Is smoking allowed?",
+        answer: "Smoking or vaping is strictly prohibited inside the facility. There is a designated smoking area outside the rear entrance."
+    },
+    {
+        id: 15,
+        question: "Does setup time count as part of my session?",
+        answer: "Yes, your booked time includes load-in, setup, and load-out. We recommend booking enough time to accommodate this so you don't feel rushed. Access to the studio begins precisely at your scheduled start time."
+    },
+    {
+        id: 16,
+        question: "Can we film video during our session?",
+        answer: "Absolutely! The studio is designed to be visually striking. You are welcome to film content for social media or music videos. If you need a full lighting package or a videographer, check out our 'Video Podcast' or 'Music Video' packages."
+    },
+    {
+        id: 17,
+        question: "Is there an age restriction?",
+        answer: "Clients under the age of 18 must be accompanied by a parent or legal guardian for the duration of the session. The guardian will need to sign the booking agreement and liability waiver."
+    },
+    {
+        id: 18,
+        question: "What file formats should I bring for my beats?",
+        answer: "We recommend bringing 2-track instrumentals as high-quality WAV or AIFF files (24-bit/44.1kHz preferred). MP3s will work, but uncompressed audio yields the best results for mixing."
+    }
 ];
 
 export const featuredSessions = [
@@ -87,31 +154,4 @@ export const featuredSessions = [
       artist: 'The Wandering Souls',
       title: 'Riverstone',
       description: 'Acoustic track captured live off-the-floor with vintage ribbon mics to preserve warmth and intimacy.',
-      imageUrl: 'https://images.unsplash.com/photo-1495434942214-9b5385ba883e?q=80&w=2070&auto-format=fit=crop',
-      audioUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/soft-and-dreamy-183350.mp3',
-    },
-    {
-      id: 2,
-      artist: 'Static Bloom',
-      title: 'Neon Engines',
-      description: 'Full band rock production with multi-layered guitars and punchy drums from our custom kit.',
-      imageUrl: 'https://images.unsplash.com/photo-1549419895-c8430a911a7a?q=80&w=1964&auto-format=fit-crop',
-      audioUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/rock-it-213562.mp3',
-    },
-    {
-      id: 3,
-      artist: 'j.wav',
-      title: 'Midnight Lo-Fi',
-      description: 'A smooth hip-hop instrumental created using our in-house collection of analog synths and drum machines.',
-      imageUrl: 'https://images.unsplash.com/photo-1593697821252-0c91d4a1a027?q=80&w=1974&auto-format=fit-crop',
-      audioUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/lofi-chill-15024.mp3',
-    },
-    {
-        id: 4,
-        artist: 'The Tech Unfiltered Podcast',
-        title: 'Episode 42: AI in Audio',
-        description: 'Pristine dialogue from a multi-guest podcast, recorded with Shure SM7Bs for that classic broadcast sound.',
-        imageUrl: 'https://images.unsplash.com/photo-1557761271-9c3f46b35e0e?q=80&w=2070&auto-format=fit-crop',
-        audioUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/inspiring-cinematic-ambient-116199.mp3',
-      },
-  ];
+      imageUrl: 'https://images.unsplash.com/photo-14954349422

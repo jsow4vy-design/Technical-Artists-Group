@@ -270,6 +270,7 @@ export const FeaturedSessionsManager: React.FC<FeaturedSessionsManagerProps> = (
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   
   const headingRef = useRef<HTMLHeadingElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -315,13 +316,22 @@ export const FeaturedSessionsManager: React.FC<FeaturedSessionsManagerProps> = (
   };
 
   // Drag & Drop Handlers
-  const handleDragStart = (index: number) => {
+  const handleDragStart = (e: React.DragEvent<HTMLLIElement>, index: number) => {
     dragItem.current = index;
+    setDraggingIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    // Optional: could set a custom drag image here
   };
 
-  const handleDragEnter = (index: number) => {
+  const handleDragEnter = (e: React.DragEvent<HTMLLIElement>, index: number) => {
+    e.preventDefault();
     dragOverItem.current = index;
     setDragOverIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
   };
 
   const handleDragEnd = () => {
@@ -338,6 +348,7 @@ export const FeaturedSessionsManager: React.FC<FeaturedSessionsManagerProps> = (
     dragItem.current = null;
     dragOverItem.current = null;
     setDragOverIndex(null);
+    setDraggingIndex(null);
   };
   
   const handleImageSelect = (dataUrl: string) => {
@@ -390,15 +401,15 @@ export const FeaturedSessionsManager: React.FC<FeaturedSessionsManagerProps> = (
             <li 
               key={session.id} 
               draggable 
-              onDragStart={() => handleDragStart(index)}
-              onDragEnter={() => handleDragEnter(index)}
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragEnter={(e) => handleDragEnter(e, index)}
               onDragEnd={handleDragEnd}
-              onDragOver={(e) => e.preventDefault()}
+              onDragOver={handleDragOver}
               className={`bg-gray-800/50 border rounded-lg p-2 flex items-center gap-4 transition-all duration-300 ${
-                dragOverIndex === index ? 'border-fuchsia-400 bg-gray-800' : 'border-fuchsia-500/20'
-              }`}
+                dragOverIndex === index ? 'border-fuchsia-400 bg-gray-800 scale-[1.02]' : 'border-fuchsia-500/20'
+              } ${draggingIndex === index ? 'opacity-40' : 'opacity-100'}`}
             >
-              <button className="p-2 text-gray-500 hover:text-white cursor-grab active:cursor-grabbing"><DragHandleIcon className="w-6 h-6" /></button>
+              <div className="p-2 text-gray-500 hover:text-white cursor-grab active:cursor-grabbing"><DragHandleIcon className="w-6 h-6" /></div>
               <div className="relative flex-shrink-0 group">
                   <img src={session.imageUrl} alt="" className="w-14 h-14 rounded-md object-cover" />
                   <button onClick={() => { setSessionToUpdateImage(session.id); setIsImagePickerOpen(true); }} className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
