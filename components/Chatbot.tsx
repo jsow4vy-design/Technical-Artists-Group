@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { startChat } from '../services/geminiService';
 import type { Message, History } from '../types';
@@ -11,11 +12,14 @@ const Chatbot: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(false);
+  
+  // Refs for auto-scroll and focus management
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatButtonRef = useRef<HTMLButtonElement>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Animate button entry on mount
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsButtonVisible(true);
@@ -23,6 +27,7 @@ const Chatbot: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Auto-scroll to bottom when messages change
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -33,16 +38,19 @@ const Chatbot: React.FC = () => {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
+    // 1. Optimistic Update
     const userMessage: Message = { role: 'user', content: inputValue };
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
 
+    // 2. Prepare History for API
     const history: History[] = [...messages, userMessage].map(msg => ({
       role: msg.role,
       parts: [{ text: msg.content }],
     }));
 
+    // 3. Call Service
     try {
         const response = await startChat(history);
         const messagesToAdd: Message[] = [];
@@ -51,8 +59,8 @@ const Chatbot: React.FC = () => {
             messagesToAdd.push({ role: 'model', content: response.text });
         }
 
+        // Handle Booking Confirmations returned from Function Calling
         if (response.newBooking) {
-            // The service returns the new booking object; this component persists it.
             try {
                 const existingBookings = JSON.parse(localStorage.getItem('underla_bookings') || '[]');
                 localStorage.setItem('underla_bookings', JSON.stringify([...existingBookings, response.newBooking]));
@@ -62,6 +70,7 @@ const Chatbot: React.FC = () => {
             }
         }
         
+        // Display confirmation details in chat
         if (response.bookingDetails) {
             const { packageName, date, time } = response.bookingDetails;
             const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -87,7 +96,7 @@ Time: ${time}`;
     }
   }, [inputValue, messages]);
 
-  // Focus management for modal behavior
+  // Accessibility: Focus Trap & Management
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {

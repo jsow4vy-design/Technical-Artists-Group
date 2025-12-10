@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { BackIcon, CheckIcon, CloseIcon } from './icons';
 import { featuredSessions as defaultFeaturedSessions } from '../data/studioData';
@@ -5,11 +6,11 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FeaturedSessionsManager } from './admin/FeaturedSessionsManager';
 import { DataTable } from './admin/DataTable';
 import { ImageManager } from './admin/ImageManager';
+import { GalleryManager } from './admin/GalleryManager';
 import { blueprintStyleAdmin } from '../styles/common';
 import type { DataItem } from '../types';
 
 type BookingStatus = 'Pending' | 'Contacted' | 'Paid';
-type InquiryStatus = 'New' | 'Contacted' | 'Proposal Sent';
 type AdminTab = 'submissions' | 'content';
 
 interface Toast {
@@ -34,14 +35,7 @@ const bookingStatusStyles: { [key in BookingStatus]: string } = {
     Paid: 'bg-green-500/20 text-green-400 border-green-500/30',
 };
 
-const inquiryStatusStyles: { [key in InquiryStatus]: string } = {
-    New: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    Contacted: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-    'Proposal Sent': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-};
-
 const AdminDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [inquiries, setInquiries] = useLocalStorage<DataItem[]>('av_inquiries', []);
   const [bookings, setBookings] = useLocalStorage<DataItem[]>('underla_bookings', []);
   const [featuredSessions, setFeaturedSessions] = useLocalStorage('underla_featured_sessions', defaultFeaturedSessions);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -68,11 +62,6 @@ const AdminDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const handleBookingStatusChange = (bookingId: number, newStatus: BookingStatus) => {
     setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
     addToast(`Booking status updated to ${newStatus}.`);
-  };
-  
-  const handleInquiryStatusChange = (inquiryId: number, newStatus: InquiryStatus) => {
-    setInquiries(inquiries.map(i => i.id === inquiryId ? { ...i, status: newStatus } : i));
-    addToast(`Inquiry status updated to ${newStatus}.`);
   };
 
   const TabButton: React.FC<{ tabId: AdminTab; children: React.ReactNode }> = ({ tabId, children }) => (
@@ -114,7 +103,7 @@ const AdminDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         
         <div className="animate-fade-in">
           {activeTab === 'submissions' && (
-            <div role="tabpanel" className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div role="tabpanel" className="max-w-5xl mx-auto">
               <DataTable
                   title="UNDERLA.STUDIO Bookings"
                   items={bookings}
@@ -123,20 +112,14 @@ const AdminDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   statusStyles={bookingStatusStyles}
                   brandColorClass="fuchsia"
                   onStatusChange={(id, status) => handleBookingStatusChange(id, status as BookingStatus)}
-              />
-              <DataTable
-                  title="AV & Broadcasting Inquiries"
-                  items={inquiries}
-                  setItems={setInquiries}
-                  statusOptions={['New', 'Contacted', 'Proposal Sent']}
-                  statusStyles={inquiryStatusStyles}
-                  brandColorClass="cyan"
-                  onStatusChange={(id, status) => handleInquiryStatusChange(id, status as InquiryStatus)}
+                  addToast={addToast}
               />
             </div>
           )}
           {activeTab === 'content' && (
-             <div role="tabpanel" className="space-y-12">
+             <div role="tabpanel" className="space-y-16">
+                <GalleryManager addToast={addToast} />
+                <hr className="border-gray-800" />
                 <FeaturedSessionsManager sessions={featuredSessions} setSessions={setFeaturedSessions} addToast={addToast} />
                 <ImageManager addToast={addToast} />
              </div>

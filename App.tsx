@@ -2,14 +2,15 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { LoadingSpinnerIcon } from './components/icons';
 
+// Lazy load components to improve initial load time
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const Chatbot = lazy(() => import('./components/Chatbot'));
 const Footer = lazy(() => import('./components/Footer'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const AdminLoginPage = lazy(() => import('./components/AdminLoginPage'));
-const AVGallery = lazy(() => import('./components/AVGallery'));
 const MoesGallery = lazy(() => import('./components/MoesGallery'));
 
+// Simple loading fallback
 const Loader: React.FC = () => (
   <div className="flex items-center justify-center h-screen w-screen bg-[#111111]">
       <LoadingSpinnerIcon />
@@ -17,33 +18,30 @@ const Loader: React.FC = () => (
 );
 
 const App: React.FC = () => {
-  type View = 'landing' | 'av' | 'moes' | 'adminLogin' | 'admin';
+  // Define available views
+  type View = 'landing' | 'moes' | 'adminLogin' | 'admin';
   const [view, setView] = useState<View>('landing');
   const [showFooter, setShowFooter] = useState(false);
 
-  const navigateToAdminLogin = () => {
-      setView('adminLogin');
-  };
-
-  const handleLoginSuccess = () => {
-      setView('admin');
-  };
-
+  // Navigation handlers
+  const navigateToAdminLogin = () => setView('adminLogin');
+  const handleLoginSuccess = () => setView('admin');
+  
   const handleBackToLanding = () => {
       setView('landing');
-      // Clear the hash to prevent re-triggering login on refresh or back navigation
+      // Clean URL hash to prevent automatic redirection on refresh
       if (window.location.hash === '#admin') {
           window.history.pushState("", document.title, window.location.pathname + window.location.search);
       }
   };
 
-  // Manage footer visibility based on current view
+  // Effect: Footer visibility logic
   useEffect(() => {
-    const isGalleryView = view === 'av' || view === 'moes';
+    const isGalleryView = view === 'moes';
     setShowFooter(isGalleryView);
   }, [view]);
 
-  // Add a keyboard shortcut to go to the admin login page
+  // Effect: Keyboard shortcut (Ctrl/Meta + Alt + A) for Admin Login
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'a') {
@@ -57,7 +55,7 @@ const App: React.FC = () => {
     };
   }, []);
   
-  // Add access via URL hash to go to the admin login page
+  // Effect: Handle URL hash for direct admin access
   useEffect(() => {
     const checkHashForAdmin = () => {
       if (window.location.hash === '#admin' && view !== 'admin' && view !== 'adminLogin') {
@@ -65,7 +63,7 @@ const App: React.FC = () => {
       }
     };
     
-    checkHashForAdmin(); // Check on initial load
+    checkHashForAdmin(); // Check on mount
     window.addEventListener('hashchange', checkHashForAdmin);
 
     return () => {
@@ -73,9 +71,32 @@ const App: React.FC = () => {
     };
   }, [view]);
 
+  // Effect: Smooth scrolling and position reset on view change
+  useEffect(() => {
+    const handleScrollPosition = () => {
+      const hash = window.location.hash;
+      if (hash && hash !== '#admin') {
+        // Scroll to specific section if hash exists
+        const id = hash.substring(1);
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        // Reset to top for new pages
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
 
-  // The landing page is a special case that takes over the full screen
-  // and does not use the standard app layout with footer/chatbot.
+    // Small delay ensures DOM is ready after lazy load suspension
+    const timer = setTimeout(handleScrollPosition, 100);
+    return () => clearTimeout(timer);
+  }, [view]);
+
+
+  // --- Render Logic ---
+
+  // Landing Page is distinct and full-screen
   if (view === 'landing') {
     return (
       <Suspense fallback={<Loader />}>
@@ -84,20 +105,17 @@ const App: React.FC = () => {
     );
   }
 
-  // All other views use the standard layout.
+  // Dynamic content rendering based on view state
   const renderContent = () => {
     switch(view) {
         case 'adminLogin':
             return <AdminLoginPage onLoginSuccess={handleLoginSuccess} onBack={handleBackToLanding} />;
         case 'admin':
             return <AdminDashboard onBack={handleBackToLanding} />;
-        case 'av':
-            return <AVGallery onBack={handleBackToLanding} />;
         case 'moes':
             return <MoesGallery onBack={handleBackToLanding} />;
         default:
-            // This is a failsafe. If an unknown view is set, go back to landing.
-            setView('landing');
+            setView('landing'); // Fallback
             return null;
     }
   };
@@ -109,8 +127,10 @@ const App: React.FC = () => {
             {renderContent()}
         </Suspense>
       </main>
-      {/* Show chatbot on gallery and admin pages, but not on login */}
+      
+      {/* Global Elements: Chatbot & Footer */}
       <Suspense fallback={null}>
+        {/* Chatbot available everywhere except login screen */}
         {view !== 'adminLogin' && <Chatbot />}
         {showFooter && <Footer onAdminLogin={navigateToAdminLogin} />}
       </Suspense>

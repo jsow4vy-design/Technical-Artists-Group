@@ -1,9 +1,10 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import type { ImageRecord } from '../../types';
 import { UploadIcon, CopyIcon, CloseIcon } from '../icons';
 
-const MAX_SIZE_MB = 1;
+const MAX_SIZE_MB = 5;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -37,9 +38,19 @@ export const ImageManager: React.FC<{ addToast: (message: string) => void }> = (
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Validation: File Type
+        if (!file.type.startsWith('image/')) {
+            setError('Invalid file type. Please select an image file.');
+            setSelectedFile(null);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            return;
+        }
+
+        // Validation: File Size
         if (file.size > MAX_SIZE_BYTES) {
             setError(`File size exceeds ${MAX_SIZE_MB}MB limit.`);
             setSelectedFile(null);
+            if (fileInputRef.current) fileInputRef.current.value = '';
             return;
         }
 

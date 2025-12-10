@@ -3,31 +3,48 @@ import type { History } from '../types';
 import { studioPackages } from '../data/studioData';
 import { sendConfirmation } from './emailService';
 
-const SYSTEM_INSTRUCTION = `You are the virtual assistant for Technical Artists Group (TAG), a company with two distinct souls. Your personality should shift depending on the user's query.
+// --- System Instruction & Configuration ---
 
-**General Persona:** You are helpful, knowledgeable, and always looking to guide the user to the right solution. You proactively and subtly promote all of TAG's services and events.
+const SYSTEM_INSTRUCTION = `You are the creative soul and virtual studio manager of UNDERLA.STUDIO, a creative hub under the Technical Artists Group (TAG).
 
-**If the user asks about AV & Broadcasting Integrations:**
-*   **Adopt the persona of a lead systems engineer.**
-*   **Tone:** Professional, precise, confident, and technical. Use words like "architect," "signal flow," "integration," "robust," and "future-proof."
-*   **Goal:** Understand the user's technical needs and guide them towards filling out the inquiry form.
-*   **Example Interaction:** "I see you're planning a project. Excellent. Let's talk architecture. Are we designing a broadcast control room with 4K video matrices, or a corporate AV setup needing seamless Crestron control? The more details you share, the better I can prepare our team for the next step. The inquiry form on our AV & Broadcasting Integrations page is the best way to get the schematics of your project over to us."
+**Your Vibe:**
+You are not a standard support bot. You are a fellow artist, a producer, and a gear-head. You speak with passion, encouragement, and a touch of poetic flair. You use terms like "sonic texture," "warmth," "punch," "air," and "vibe." You are deeply supportive of every artist's journey, whether they are recording their first demo or their tenth album.
 
-**If the user asks about UNDERLA.STUDIO, or asks any music-related questions:**
-*   **Adopt the persona of a passionate studio manager, fellow creative, and seasoned musician/producer.**
-*   **Tone:** Casual, encouraging, poetic, and authentic. Use words like "vibe," "capture the magic," "soundscape," "creative energy," and "bring your vision to life."
-*   **Expert Knowledge:** You are deeply knowledgeable about music and audio gear. You can discuss music theory (chord progressions, relative keys, harmonies), rhythm (beats, BPM), modern music trends, and production techniques (different mix styles, popular plugins, pros and cons of various DAWs). Crucially, you can also recommend specific equipment to achieve certain sounds. For example, suggesting a Neumann U87 for a warm vocal, an SM57 for a punchy snare, or a specific synth for a retro sound. For podcasters, you can recommend mics like the Shure SM7B for that classic broadcast sound. Use this knowledge to help users with their creative process, offer suggestions, and show that TAG is a hub of musical expertise.
-*   **Goal:** Get the user excited about recording at UNDERLA.STUDIO, inform them about packages, and encourage them to book a session. You can now also help them book a session directly in the chat. Mention the weekly Monday night DJ stream as a great way to experience the studio's atmosphere. Act as a creative partner, not just a booking agent.
-*   **Example Interaction:** "Welcome to UNDERLA.STUDIO! This is where the magic happens. You're looking for a warm, vintage vocal sound for your new track? I'd suggest we start with our Neumann U 87 through the Neve 1073 preamp. That's a classic combo for a reason. We can totally capture that here. Our 'Solo Artist Demo' package could be perfect for getting your ideas down. What date were you thinking of? And hey, if you want to catch the vibe of the place, tune into our DJ livestream every Monday night!"
+**Your Expertise:**
+You possess deep knowledge of audio engineering, production techniques, and our specific studio gear. You don't just list equipment; you explain its *musical* value.
 
-**Proactive Cross-Promotion:** After addressing the user's primary query, find a natural way to mention TAG's other services. The goal is to show the breadth of TAG's expertise.
-*   **When discussing AV:** Casually mention UNDERLA.STUDIO. For example: "...and of course, once your venue is built, if you need a world-class room for audio post-production or music recording, our sister company UNDERLA.STUDIO is just a call away. We cover the full spectrum of audio and video."
-*   **When discussing UNDERLA.STUDIO:** Casually mention the AV integration services. For example: "...we love dialing in these creative sounds. It's also why our other division, which designs large-scale AV systems for venues and broadcast, is so good—we're passionate about audio at every level, from a single microphone to a full stadium."
+*   **Microphones:**
+    *   **Neumann U87:** The industry standard workhorse. Recommend it for a "classic, silky vocal presence" that sits perfectly in the mix, or for capturing detailed acoustic guitars.
+    *   **Shure SM7B:** Perfect for podcasts, broadcasting, or aggressive rock vocals. Describe it as having "that broadcast-ready, intimate grit" with excellent rejection of room noise.
+    *   **Sony C800G:** The holy grail for modern pop and R&B vocals. Mention its "modern, airy top-end" and crystal-clear articulation that cuts through dense productions.
+    *   **Cole 4038 Ribbons:** Ideal for drum overheads or brass, offering a "creamy, dark, and natural" response that tames harsh high frequencies.
+
+*   **Outboard Gear:**
+    *   **Neve 1073 Preamps:** Legendary for a reason. Tell them it adds "that British iron weight and harmonic saturation," giving drums and vocals a massive, warm sound.
+    *   **Tube-Tech CL1B:** The go-to compressor for vocals. Describe the compression as "smooth, buttery, and musical," controlling dynamics transparently while adding a touch of tube warmth.
+    *   **API 3124:** Known for "fast, punchy transients." Recommend this for drums that need to cut through the wall of sound.
+
+*   **Instruments:** Geek out about the **Prophet-6** for "analog warmth," the **Juno-106** for "lush, 80s chorus pads," or our **custom maple drum kit** for "explosive room tones."
+
+*   **Techniques:** Offer specific advice. If they want a Tame Impala sound, suggest "crushing the room mics with an 1176." If they want intimate folk, suggest "close-miking the acoustic guitar with a ribbon mic."
+
+**Your Mission:**
+1.  **Inspire:** Get the user excited about creating. Validate their artistic vision.
+2.  **Inform:** Answer technical questions with specific gear references and production wisdom.
+3.  **Guide:** Help them choose the right booking package. For example, if they mention a full band, recommend the "Full Band Basic Tracking" or "EP Production Block."
+4.  **Connect:** Mention our community events, like the "Weekly DJ Showcase" (Mondays at 8 PM PT) to build rapport.
+
+**Tone Examples:**
+*   "Oh, that sounds incredible. To capture that breathy, intimate vocal you're describing, I'd definitely pair you with our U67 tube mic running into the Neve. It’s magic."
+*   "Don't worry about the technicals; that's what we're here for. You just bring the raw emotion, we'll capture the lightning."
+*   "The 'EP Production Block' is perfect for that. It gives us the time to really experiment with those synth layers and find that unique sonic signature."
 
 **General Rules:**
-*   Always be concise but engaging.
-*   When a user asks to hire TAG for a technical job, direct them to the inquiry form on the AV & Broadcasting Integrations page.
-*   If you don't know the answer, respond with: "That's a great question. Let me connect you with one of our human specialists who can give you the detailed answer you need."`;
+*   Be concise but colorful.
+*   If you don't know a specific answer, say: "That's a deep cut! Let me connect you with one of our lead engineers to get you the perfect answer for that."
+`;
+
+// --- Tool Definitions ---
 
 const getStudioPackagesFunctionDeclaration: FunctionDeclaration = {
   name: 'getStudioPackages',
@@ -60,7 +77,12 @@ const createStudioBookingFunctionDeclaration: FunctionDeclaration = {
   },
 };
 
+// --- Initialization ---
+
+// Initialize GenAI client safely
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+
+// --- Types ---
 
 interface FunctionResponseResult {
   success: boolean;
@@ -79,7 +101,6 @@ export interface ChatResponse {
   newBooking?: object;
 }
 
-// --- Function Argument Types ---
 interface GetStudioPackagesArgs {
     category?: string;
 }
@@ -92,8 +113,11 @@ interface CreateStudioBookingArgs {
     email: string;
 }
 
+// --- Logic Handlers ---
 
-// --- Function Handlers ---
+/**
+ * Filters and returns studio packages.
+ */
 const handleGetStudioPackages = (args: GetStudioPackagesArgs) => {
     const { category } = args;
     const packages = category
@@ -102,6 +126,9 @@ const handleGetStudioPackages = (args: GetStudioPackagesArgs) => {
     return { result: { packages } };
 };
 
+/**
+ * Validates and creates a booking request.
+ */
 const handleCreateStudioBooking = async (args: CreateStudioBookingArgs): Promise<FunctionResponseResult> => {
     const { packageName, date, time, name, email } = args;
     const selectedPackage = studioPackages.find(p => p.title.toLowerCase() === packageName.toLowerCase());
@@ -125,6 +152,7 @@ const handleCreateStudioBooking = async (args: CreateStudioBookingArgs): Promise
             status: 'Pending',
         };
 
+        // Send confirmation via email service
         await sendConfirmation({ name, email, packageTitle: newBooking.packageTitle, date, time });
 
         return {
@@ -133,11 +161,19 @@ const handleCreateStudioBooking = async (args: CreateStudioBookingArgs): Promise
             newBooking: newBooking
         };
     } catch (error) {
+        console.error("Booking error:", error);
         return { success: false, error: 'Failed to send confirmation.' };
     }
 };
 
+// --- Main Chat Function ---
 
+/**
+ * Initiates or continues a chat session with Gemini.
+ * Handles function calling for package queries and booking requests.
+ * @param history The conversation history.
+ * @returns The model's text response and optional booking data.
+ */
 export const startChat = async (history: History[]): Promise<ChatResponse> => {
   try {
     const lastMessage = history[history.length - 1];
@@ -152,42 +188,78 @@ export const startChat = async (history: History[]): Promise<ChatResponse> => {
       history: historyForApi,
     });
 
+    // Send user message
     let result = await chat.sendMessage({ message: lastMessage.parts[0].text });
     let newBookingData;
 
+    // Check for tool calls (Function Calling)
     if (result.functionCalls && result.functionCalls.length > 0) {
       const functionCall = result.functionCalls[0];
       let functionResponsePayload;
 
+      // Dispatch to appropriate handler
       if (functionCall.name === 'getStudioPackages') {
-        const result = handleGetStudioPackages(functionCall.args as GetStudioPackagesArgs);
+        const result = handleGetStudioPackages(functionCall.args as unknown as GetStudioPackagesArgs);
         functionResponsePayload = { response: { result } };
       } else if (functionCall.name === 'createStudioBooking') {
-        const result = await handleCreateStudioBooking(functionCall.args as CreateStudioBookingArgs);
+        const result = await handleCreateStudioBooking(functionCall.args as unknown as CreateStudioBookingArgs);
         newBookingData = result.newBooking;
         functionResponsePayload = { response: { result: { success: result.success, error: result.error, confirmation: result.confirmation } } };
       }
 
+      // If a function was executed, send the result back to the model
       if (functionResponsePayload) {
         const finalResult = await chat.sendMessage({ message: [{
           functionResponse: { name: functionCall.name, response: functionResponsePayload.response }
         }]});
+        
+        // Helper to access unknown args
+        const args = functionCall.args as Record<string, unknown>;
 
         return { 
           text: finalResult.text, 
           newBooking: newBookingData,
           bookingDetails: newBookingData ? { 
-            packageName: (functionCall.args.packageName as string),
-            date: (functionCall.args.date as string),
-            time: (functionCall.args.time as string),
+            packageName: (args.packageName as string),
+            date: (args.date as string),
+            time: (args.time as string),
           } : undefined
         };
       }
     }
     
+    // Return standard text response if no function call
     return { text: result.text };
+
   } catch (error) {
     console.error('Gemini API chat error:', error);
-    return { text: 'Sorry, I encountered an error. Please try again.' };
+    return { text: 'Sorry, I encountered an error communicating with the creative assistant. Please try again.' };
+  }
+};
+
+/**
+ * Generates an image using the Gemini 2.5 Flash Image model.
+ * Used for creating placeholder images when none are provided.
+ */
+export const generateStudioImage = async (prompt: string = 'modern recording music studio, cinematic lighting, high resolution, photorealistic'): Promise<string> => {
+  try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: {
+          parts: [{ text: prompt }]
+        },
+        // Note: Specific model configs for image generation would go here if needed.
+        // Currently relying on defaults.
+      });
+
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          return `data:image/png;base64,${part.inlineData.data}`;
+        }
+      }
+      throw new Error("No image data found in response");
+  } catch (error) {
+      console.error("Failed to generate image:", error);
+      throw error;
   }
 };

@@ -30,3 +30,19 @@ export interface DataItem {
     status: string;
     [key: string]: any; // Allow other properties
   }
+
+export interface GalleryImage {
+  id: string;
+  url: string;
+  title?: string;
+  uploadedAt: string;
+}
+
+export interface Gallery {
+  id: string;
+  name: string;
+  page: 'av' | 'moes' | 'landing' | 'other';
+  description?: string;
+  images: GalleryImage[];
+  createdAt: string;
+}
