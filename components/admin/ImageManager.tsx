@@ -126,7 +126,7 @@ export const ImageManager: React.FC<{ addToast: (message: string) => void }> = (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {images.map(image => (
                     <div key={image.id} className="group relative bg-gray-800/50 border border-cyan-500/20 rounded-lg overflow-hidden">
-                        <img src={image.dataUrl} alt={image.name} className="aspect-square w-full object-cover"/>
+                        <img src={image.dataUrl} alt={image.name} className="aspect-square w-full object-cover" loading="lazy" />
                         <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2 text-white">
                             <p className="text-xs font-semibold break-all">{image.name}</p>
                             <div className="flex justify-end gap-2">

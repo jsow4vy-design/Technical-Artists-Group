@@ -1,26 +1,30 @@
 
 import React from 'react';
 
-export const ChatIcon: React.FC = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+// Added className prop support for ChatIcon
+export const ChatIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
   </svg>
 );
 
-export const CloseIcon: React.FC = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+// Added className prop support for CloseIcon
+export const CloseIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
   </svg>
 );
 
-export const SendIcon: React.FC = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+// Added className prop support for SendIcon
+export const SendIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-5 w-5"} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
   </svg>
 );
 
-export const BackIcon: React.FC = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true" focusable="false">
+// Added className prop support for BackIcon
+export const BackIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true" focusable="false">
     <path strokeLinecap="round" strokeLinejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
   </svg>
 );
@@ -43,15 +47,16 @@ export const CheckIcon: React.FC<{className?: string}> = ({ className }) => (
     </svg>
 );
 
-export const LoadingSpinnerIcon: React.FC = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 animate-spin text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+// Added className prop support for LoadingSpinnerIcon
+export const LoadingSpinnerIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-5 w-5 animate-spin text-fuchsia-400"} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m8.66-12.66l-.707.707M4.043 19.957l-.707.707m16.971 0l-.707-.707M4.043 4.043l-.707-.707M12 21a9 9 0 100-18 9 9 0 000 18z" />
   </svg>
 );
 
 export const RefreshIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M20.944 12.979c.489 1.507.144 3.18-1.029 4.353-1.173 1.173-2.846 1.518-4.353 1.029m-9.124-9.124c-.489-1.507-.144-3.18 1.029-4.353 1.173-1.173 2.846-1.518 4.353-1.029m7.096 7.096L21 7.5m-10.5 14L3 13.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20.944 12.979c.489 1.507.144 3.18-1.029 4.353-1.173 1.173-2.846 1.518-4.353 1.029m-9.124-9.124c-.489-1.507-.144-3.18 1.029-4.353 1.173-1.173-2.846-1.518 4.353-1.029m7.096 7.096L21 7.5m-10.5 14L3 13.5" />
     </svg>
 );
 
@@ -79,15 +84,33 @@ export const YouTubeIcon: React.FC<{ className?: string }> = ({ className }) => 
     </svg>
 );
 
-export const PlayIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+export const PlayIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M8 5v14l11-7z" />
     </svg>
 );
 
-export const PauseIcon: React.FC = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+export const PauseIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+    </svg>
+);
+
+export const SkipBackIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+    </svg>
+);
+
+export const SkipForwardIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+    </svg>
+);
+
+export const VolumeIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-6 w-6"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
     </svg>
 );
 
@@ -161,4 +184,10 @@ export const ChevronRightIcon: React.FC<{ className?: string }> = ({ className }
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true" focusable="false">
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
     </svg>
+);
+
+export const ChevronDownIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className || "h-5 w-5"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true" focusable="false">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+  </svg>
 );

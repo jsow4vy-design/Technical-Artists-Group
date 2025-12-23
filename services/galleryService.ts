@@ -114,6 +114,17 @@ export const uploadImageToGallery = async (galleryId: string, file: File): Promi
     return newImage;
 };
 
+export const updateGalleryImages = async (galleryId: string, newImages: GalleryImage[]): Promise<void> => {
+    await delay(100);
+    const galleries = await getGalleries();
+    const galleryIndex = galleries.findIndex(g => g.id === galleryId);
+    
+    if (galleryIndex === -1) throw new Error("Gallery not found");
+
+    galleries[galleryIndex].images = newImages;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(galleries));
+};
+
 export const deleteImageFromGallery = async (galleryId: string, imageId: string): Promise<void> => {
     await delay(300);
     const galleries = await getGalleries();

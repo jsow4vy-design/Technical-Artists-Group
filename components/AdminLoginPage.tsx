@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { BackIcon } from './icons';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import { blueprintStyleAdminLogin } from '../styles/common';
 
 interface AdminLoginPageProps {
@@ -7,13 +9,14 @@ interface AdminLoginPageProps {
   onBack: () => void;
 }
 
-const LOGO_URL = 'https://i.imgur.com/x02n31a.png';
+const DEFAULT_LOGO_URL = 'https://i.imgur.com/x02n31a.png';
 
 const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, onBack }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+  const [logoUrl] = useLocalStorage<string>('tag_logo_url', DEFAULT_LOGO_URL);
 
   useEffect(() => {
     passwordInputRef.current?.focus();
@@ -49,7 +52,7 @@ const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, onBack 
             </button>
         </div>
         <div className="w-full max-w-sm text-center">
-            <img src={LOGO_URL} alt="Technical Artists Group Logo" className="w-48 h-auto mx-auto mb-8" />
+            <img src={logoUrl} alt="Technical Artists Group Logo" className="w-48 h-auto mx-auto mb-8" />
             <h1 className="text-3xl font-bold uppercase tracking-widest text-white mb-2">Admin Access</h1>
             <p className="text-gray-400 mb-8">Enter the password to manage the dashboard.</p>
             <form onSubmit={handleSubmit}>

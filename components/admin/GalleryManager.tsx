@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { getGalleries, createGallery, deleteGallery, uploadImageToGallery, deleteImageFromGallery } from '../../services/galleryService';
+import { getGalleries, createGallery, deleteGallery, uploadImageToGallery, deleteImageFromGallery, updateGalleryImages } from '../../services/galleryService';
 import type { Gallery, GalleryImage } from '../../types';
 import { UploadIcon, CloseIcon, CheckIcon, LoadingSpinnerIcon, DragHandleIcon, EditIcon } from '../icons';
 import { Input, Select, Textarea } from '../FormControls';
@@ -39,7 +39,7 @@ const GalleryCard: React.FC<{ gallery: Gallery; onClick: () => void; onDelete: (
         <div className="flex items-center gap-2">
             <div className="flex -space-x-2 overflow-hidden">
                 {gallery.images.slice(0, 3).map((img) => (
-                    <img key={img.id} src={img.url} alt="Preview" className="inline-block h-8 w-8 rounded-full ring-2 ring-gray-800 object-cover" />
+                    <img key={img.id} src={img.url} alt="Preview" className="inline-block h-8 w-8 rounded-full ring-2 ring-gray-800 object-cover" loading="lazy" />
                 ))}
             </div>
             <span className="text-xs text-gray-500 ml-2">{gallery.images.length} images</span>
@@ -93,9 +93,16 @@ const GalleryDetailModal: React.FC<{
     onClose: () => void; 
     onUpload: (file: File) => Promise<void>; 
     onDeleteImage: (imageId: string) => Promise<void>;
-}> = ({ gallery, onClose, onUpload, onDeleteImage }) => {
+    onReorderImages: (newImages: GalleryImage[]) => Promise<void>;
+}> = ({ gallery, onClose, onUpload, onDeleteImage, onReorderImages }) => {
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Drag and Drop State
+    const dragItem = useRef<number | null>(null);
+    const dragOverItem = useRef<number | null>(null);
+    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+    const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -108,6 +115,44 @@ const GalleryDetailModal: React.FC<{
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
         }
+    };
+
+    // Drag Handlers
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+        dragItem.current = index;
+        setDraggingIndex(index);
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+        e.preventDefault();
+        dragOverItem.current = index;
+        setDragOverIndex(index);
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    const handleDragEnd = async () => {
+        const startIndex = dragItem.current;
+        const endIndex = dragOverItem.current;
+
+        if (startIndex !== null && endIndex !== null && startIndex !== endIndex) {
+            const newImages = [...gallery.images];
+            const draggedItemContent = newImages.splice(startIndex, 1)[0];
+            newImages.splice(endIndex, 0, draggedItemContent);
+            
+            // Optimistic update handled by parent prop, but async save happens here
+            await onReorderImages(newImages);
+        }
+
+        // Reset state
+        dragItem.current = null;
+        dragOverItem.current = null;
+        setDragOverIndex(null);
+        setDraggingIndex(null);
     };
 
     return (
@@ -146,17 +191,31 @@ const GalleryDetailModal: React.FC<{
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                            {gallery.images.map(img => (
-                                <div key={img.id} className="group relative aspect-square bg-gray-800 rounded-md overflow-hidden border border-gray-700">
-                                    <img src={img.url} alt={img.title} className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            {gallery.images.map((img, index) => (
+                                <div 
+                                    key={img.id} 
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, index)}
+                                    onDragEnter={(e) => handleDragEnter(e, index)}
+                                    onDragOver={handleDragOver}
+                                    onDragEnd={handleDragEnd}
+                                    className={`group relative aspect-square bg-gray-800 rounded-md overflow-hidden border border-gray-700 cursor-move transition-all duration-300
+                                        ${dragOverIndex === index ? 'scale-105 border-cyan-400 ring-2 ring-cyan-400 z-10' : ''}
+                                        ${draggingIndex === index ? 'opacity-40' : 'opacity-100'}
+                                    `}
+                                >
+                                    <img src={img.url} alt={img.title} className="w-full h-full object-cover pointer-events-none" loading="lazy" />
+                                    <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center ${draggingIndex !== null ? 'opacity-0 group-hover:opacity-0' : ''}`}>
                                         <button 
-                                            onClick={() => onDeleteImage(img.id)}
+                                            onClick={(e) => { e.stopPropagation(); onDeleteImage(img.id); }}
                                             className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500 transition-colors"
                                             title="Delete Image"
                                         >
                                             <CloseIcon />
                                         </button>
+                                    </div>
+                                    <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded p-1">
+                                         <DragHandleIcon className="w-4 h-4 text-white" />
                                     </div>
                                     <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/90 to-transparent">
                                         <p className="text-xs text-white truncate">{img.title}</p>
@@ -240,6 +299,24 @@ export const GalleryManager: React.FC<GalleryManagerProps> = ({ addToast }) => {
         }
     };
 
+    const handleReorderImages = async (newImages: GalleryImage[]) => {
+        if (!selectedGallery) return;
+        
+        // Optimistic UI Update
+        const updatedGallery = { ...selectedGallery, images: newImages };
+        setSelectedGallery(updatedGallery);
+        setGalleries(prev => prev.map(g => g.id === updatedGallery.id ? updatedGallery : g));
+
+        try {
+            await updateGalleryImages(selectedGallery.id, newImages);
+            addToast('Image order saved.');
+        } catch (e) {
+            addToast('Failed to save image order.');
+            // Revert on error (could be implemented more robustly with previous state backup)
+            loadGalleries();
+        }
+    };
+
     if (isLoading) return <div className="flex justify-center p-12"><LoadingSpinnerIcon /></div>;
 
     return (
@@ -287,6 +364,7 @@ export const GalleryManager: React.FC<GalleryManagerProps> = ({ addToast }) => {
                     onClose={() => setSelectedGallery(null)}
                     onUpload={handleUploadImage}
                     onDeleteImage={handleDeleteImage}
+                    onReorderImages={handleReorderImages}
                 />
             )}
         </section>

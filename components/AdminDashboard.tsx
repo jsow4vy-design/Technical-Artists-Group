@@ -5,13 +5,14 @@ import { featuredSessions as defaultFeaturedSessions } from '../data/studioData'
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FeaturedSessionsManager } from './admin/FeaturedSessionsManager';
 import { DataTable } from './admin/DataTable';
-import { ImageManager } from './admin/ImageManager';
+import { TeamManager } from './admin/TeamManager';
 import { GalleryManager } from './admin/GalleryManager';
+import { LogoManager } from './admin/LogoManager';
 import { blueprintStyleAdmin } from '../styles/common';
-import type { DataItem } from '../types';
+import type { DataItem, FeaturedSession } from '../types';
 
 type BookingStatus = 'Pending' | 'Contacted' | 'Paid';
-type AdminTab = 'submissions' | 'content';
+type AdminTab = 'submissions' | 'content' | 'roster';
 
 interface Toast {
   id: number;
@@ -37,7 +38,9 @@ const bookingStatusStyles: { [key in BookingStatus]: string } = {
 
 const AdminDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [bookings, setBookings] = useLocalStorage<DataItem[]>('underla_bookings', []);
-  const [featuredSessions, setFeaturedSessions] = useLocalStorage('underla_featured_sessions', defaultFeaturedSessions);
+  // Added FeaturedSession[] generic to useLocalStorage to fix mediaType inference
+  const [featuredSessions, setFeaturedSessions] = useLocalStorage<FeaturedSession[]>('underla_featured_sessions', defaultFeaturedSessions);
+  const [studioName] = useLocalStorage<string>('tag_studio_name', 'UNDR:LA Studios');
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [activeTab, setActiveTab] = useState<AdminTab>('submissions');
   
@@ -87,7 +90,7 @@ const AdminDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <header ref={headerRef} className="p-8 flex items-center justify-between fixed top-0 left-0 right-0 bg-[#111]/80 backdrop-blur-sm z-40">
         <div>
           <h1 className="text-4xl font-bold uppercase tracking-widest text-white">Admin Dashboard</h1>
-          <p className="text-gray-400">Booking & Inquiry Overview</p>
+          <p className="text-gray-400">Managing {studioName}</p>
         </div>
         <button onClick={onBack} className="flex items-center space-x-2 text-gray-300 hover:text-[#00ffff] transition-colors p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400">
           <BackIcon />
@@ -98,14 +101,15 @@ const AdminDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <main className="p-8" style={{ paddingTop: `${headerHeight}px` }}>
         <div role="tablist" className="flex justify-center border-b border-gray-700/50 mb-12">
             <TabButton tabId="submissions">Submissions</TabButton>
-            <TabButton tabId="content">Content</TabButton>
+            <TabButton tabId="roster">Team Roster</TabButton>
+            <TabButton tabId="content">Site Content</TabButton>
         </div>
         
-        <div className="animate-fade-in">
+        <div className="animate-fade-in max-w-6xl mx-auto">
           {activeTab === 'submissions' && (
             <div role="tabpanel" className="max-w-5xl mx-auto">
               <DataTable
-                  title="UNDERLA.STUDIO Bookings"
+                  title="Studio Bookings"
                   items={bookings}
                   setItems={setBookings}
                   statusOptions={['Pending', 'Contacted', 'Paid']}
@@ -116,12 +120,20 @@ const AdminDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               />
             </div>
           )}
+          
+          {activeTab === 'roster' && (
+             <div role="tabpanel">
+                <TeamManager addToast={addToast} />
+             </div>
+          )}
+
           {activeTab === 'content' && (
              <div role="tabpanel" className="space-y-16">
+                <LogoManager addToast={addToast} />
+                <hr className="border-gray-800" />
                 <GalleryManager addToast={addToast} />
                 <hr className="border-gray-800" />
                 <FeaturedSessionsManager sessions={featuredSessions} setSessions={setFeaturedSessions} addToast={addToast} />
-                <ImageManager addToast={addToast} />
              </div>
           )}
         </div>

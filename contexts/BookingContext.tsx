@@ -9,34 +9,49 @@ export type StudioPackage = typeof studioPackages[0];
 export interface BookingState {
     packageId: number | null;
     addonIds: Set<number>;
-    date: string;
-    time: string;
-    name: string;
-    email: string;
-    projectDetails: string;
+    formData: {
+        date: string;
+        time: string;
+        name: string;
+        email: string;
+        projectDetails: string;
+    };
+    agreedToTerms: boolean;
 }
 
 export type BookingAction =
     | { type: 'SELECT_PACKAGE'; packageId: number }
     | { type: 'TOGGLE_ADDON'; addonId: number }
-    | { type: 'SET_FIELD'; field: keyof BookingState; value: string }
+    | { type: 'UPDATE_FORM'; field: keyof BookingState['formData']; value: string }
+    | { type: 'SET_TERMS'; value: boolean }
     | { type: 'RESET' };
 
 const INITIAL_STATE: BookingState = {
     packageId: null,
     addonIds: new Set(),
-    date: '',
-    time: '',
-    name: '',
-    email: '',
-    projectDetails: ''
+    formData: {
+        date: '',
+        time: '',
+        name: '',
+        email: '',
+        projectDetails: ''
+    },
+    agreedToTerms: false
 };
 
-// --- Helper Functions ---
+// --- Context ---
 
-export const isAddonPackage = (pkg: StudioPackage) => pkg.category === "Engineer Add-ons";
+interface BookingContextType {
+    state: BookingState;
+    dispatch: React.Dispatch<BookingAction>;
+    totalPrice: number;
+    selectedPackage: StudioPackage | undefined;
+    selectedAddons: StudioPackage[];
+    isReadyToBook: boolean;
+    categories: string[];
+}
 
-// --- Reducer ---
+const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
 const bookingReducer = (state: BookingState, action: BookingAction): BookingState => {
     switch (action.type) {
@@ -53,8 +68,13 @@ const bookingReducer = (state: BookingState, action: BookingAction): BookingStat
                 newAddons.add(action.addonId);
             }
             return { ...state, addonIds: newAddons };
-        case 'SET_FIELD':
-            return { ...state, [action.field]: action.value };
+        case 'UPDATE_FORM':
+            return {
+                ...state,
+                formData: { ...state.formData, [action.field]: action.value }
+            };
+        case 'SET_TERMS':
+            return { ...state, agreedToTerms: action.value };
         case 'RESET':
             return INITIAL_STATE;
         default:
@@ -62,41 +82,48 @@ const bookingReducer = (state: BookingState, action: BookingAction): BookingStat
     }
 };
 
-// --- Context ---
-
-interface BookingContextType {
-    state: BookingState;
-    dispatch: React.Dispatch<BookingAction>;
-    totalPrice: number;
-    selectedPackage: StudioPackage | undefined;
-    selectedAddons: StudioPackage[];
-}
-
-const BookingContext = createContext<BookingContextType | undefined>(undefined);
-
 export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [state, dispatch] = useReducer(bookingReducer, INITIAL_STATE);
 
-    const { totalPrice, selectedPackage, selectedAddons } = useMemo(() => {
-        const mainPackage = studioPackages.find(p => p.id === state.packageId);
-        const addons = studioPackages.filter(p => state.addonIds.has(p.id));
+    const memoizedValues = useMemo(() => {
+        const selectedPackage = studioPackages.find(p => p.id === state.packageId);
+        const selectedAddons = studioPackages.filter(p => state.addonIds.has(p.id));
         
-        let total = mainPackage?.price || 0;
-        addons.forEach(addon => {
-            if (addon.title === "Studio Engineer (Hourly)") total += addon.price * 3; // Est. 3 hours
-            else if (addon.title === "Session Musician") total += addon.price * 2; // Est. 2 hours
-            else total += addon.price;
+        // Calculate Total Price based on logic rules
+        let total = selectedPackage?.price || 0;
+        selectedAddons.forEach(addon => {
+            // Business Rule: Some add-ons have minimum hour requirements for estimates
+            if (addon.title.includes("(Hourly)") || addon.title === "Session Musician") {
+                const minHours = addon.title === "Session Musician" ? 2 : 3;
+                total += (addon.price || 0) * minHours;
+            } else {
+                total += (addon.price || 0);
+            }
         });
-        
+
+        const isReadyToBook = !!(
+            state.packageId && 
+            state.formData.name && 
+            state.formData.email && 
+            state.formData.date && 
+            state.formData.time && 
+            state.agreedToTerms
+        );
+
+        // Derive unique categories dynamically for scalability
+        const categories = Array.from(new Set(studioPackages.map(p => p.category)));
+
         return { 
             totalPrice: total, 
-            selectedPackage: mainPackage, 
-            selectedAddons: addons 
+            selectedPackage, 
+            selectedAddons,
+            isReadyToBook,
+            categories
         };
-    }, [state.packageId, state.addonIds]);
+    }, [state]);
 
     return (
-        <BookingContext.Provider value={{ state, dispatch, totalPrice, selectedPackage, selectedAddons }}>
+        <BookingContext.Provider value={{ state, dispatch, ...memoizedValues }}>
             {children}
         </BookingContext.Provider>
     );

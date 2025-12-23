@@ -1,4 +1,5 @@
 
+import type { FeaturedSession } from '../types';
 
 export const studioPackages = [
     // Recording & Tracking (5 packages)
@@ -32,26 +33,47 @@ export const studioTeam = [
     {
         id: 1,
         name: 'Moe White',
-        role: 'Lead Engineer & Studio Manager',
-        imageUrl: 'https://images.unsplash.com/photo-1581599933458-2abc9b8c03b3?q=80&w=1974&auto-format=fit-crop',
+        role: 'Lead Engineer & Artist',
+        imageUrl: 'https://images.unsplash.com/photo-1581599933458-2abc9b8c03b3?q=80&w=800&auto=format&fit=crop&fm=webp',
         expertise: ['Analog Recording', 'Live Band Tracking', 'Vocal Production', 'Mixing'],
+        categories: ['Team', 'Artist'],
         bio: 'With over 15 years in the industry, Moe is a disciple of classic Glyn Johns and Al Schmitt recording techniques. His work has been featured on Grammy-nominated albums, and he’s the go-to for artists wanting to capture raw, authentic energy on tape.'
     },
     {
         id: 2,
         name: 'j.wav',
-        role: 'Producer/Engineer & DJ',
-        imageUrl: 'https://images.unsplash.com/photo-1629276301820-0f37c355e141?q=80&w=1974&auto-format=fit-crop',
+        role: 'Producer/Engineer & Artist',
+        imageUrl: 'https://images.unsplash.com/photo-1629276301820-0f37c355e141?q=80&w=800&auto=format&fit=crop&fm=webp',
         expertise: ['Hip-Hop & Electronic Production', 'Beat Making', 'Sound Design', 'Live Streaming'],
+        categories: ['Team', 'Artist'],
         bio: 'j.wav is the architect behind our modern sound. A master of DAWs and synths, he excels at building tracks from the ground up and curates our weekly DJ livestreams.'
     },
     {
         id: 3,
         name: 'Dee Strange',
         role: 'Rapper & Master Arranger',
-        imageUrl: 'https://images.unsplash.com/photo-1499415474447-8313a7c36a46?q=80&w=2070&auto-format=fit-crop',
+        imageUrl: 'https://images.unsplash.com/photo-1499415474447-8313a7c36a46?q=80&w=800&auto=format&fit=crop&fm=webp',
         expertise: ['Melodic Rap', 'Arrangement', 'Songwriting', 'Vocal Production'],
+        categories: ['Team', 'Artist'],
         bio: 'Dee is a rapper turned emo rap (melodic rap) master arranger, with over 300 unreleased tracks ready for release. He specializes in crafting infectious hooks and emotionally charged arrangements that define the new wave of hip-hop.'
+    },
+    {
+        id: 4,
+        name: 'INSANE',
+        role: 'Tracking Engineer & Energy Architect',
+        imageUrl: 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?q=80&w=800&auto=format&fit=crop&fm=webp',
+        expertise: ['Heavy Metal', 'Punk', 'Distorted Textures', 'Live Energy'],
+        categories: ['Team'],
+        bio: 'Known for his relentless pursuit of the perfect take, INSANE specializes in aggressive genres where clarity and power are paramount. He brings a high-octane workflow to UNDR:LA, ensuring every session hits with maximum impact.'
+    },
+    {
+        id: 5,
+        name: 'Widow',
+        role: 'Vocalist & Dark Pop Visionary',
+        imageUrl: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=800&auto=format&fit=crop&fm=webp',
+        expertise: ['Dark Pop', 'Industrial', 'Melodic Arrangement', 'Songwriting'],
+        categories: ['Artist'],
+        bio: 'Widow is the ethereal voice of the underground. With a background in classical training and a passion for industrial electronics, she crafts haunting melodies that linger long after the track ends.'
     }
 ];
 
@@ -105,53 +127,53 @@ export const studioFaqs = [
         id: 10,
         question: "Is there Wi-Fi available?",
         answer: "Yes, we have high-speed fiber internet (1Gbps up/down) available throughout the studio for client use. It's perfect for downloading reference tracks, uploading content, or livestreaming your session."
-    },
-    {
-        id: 11,
-        question: "Can we eat or drink in the studio?",
-        answer: "Food and drinks are allowed in the lounge and kitchen areas. We ask that only water in sealed containers be brought into the control rooms and live rooms to protect the equipment."
-    },
-    {
-        id: 12,
-        question: "Is there a limit on how many guests I can bring?",
-        answer: "For comfort and safety, we recommend keeping your session to essential personnel. If you expect a group larger than 8 people, please let us know in advance so we can accommodate you."
-    },
-    {
-        id: 13,
-        question: "Do you offer long-term lockouts?",
-        answer: "Yes! We offer discounted rates for weekly or monthly lockouts. This is perfect for album projects where you want to leave your gear set up. Contact us for custom pricing."
-    },
-    {
-        id: 14,
-        question: "Is smoking allowed?",
-        answer: "Smoking or vaping is strictly prohibited inside the facility. There is a designated smoking area outside the rear entrance."
-    },
-    {
-        id: 15,
-        question: "Does setup time count as part of my session?",
-        answer: "Yes, your booked time includes load-in, setup, and load-out. We recommend booking enough time to accommodate this so you don't feel rushed. Access to the studio begins precisely at your scheduled start time."
-    },
-    {
-        id: 16,
-        question: "Can we film video during our session?",
-        answer: "Absolutely! The studio is designed to be visually striking. You are welcome to film content for social media or music videos. If you need a full lighting package or a videographer, check out our 'Video Podcast' or 'Music Video' packages."
-    },
-    {
-        id: 17,
-        question: "Is there an age restriction?",
-        answer: "Clients under the age of 18 must be accompanied by a parent or legal guardian for the duration of the session. The guardian will need to sign the booking agreement and liability waiver."
-    },
-    {
-        id: 18,
-        question: "What file formats should I bring for my beats?",
-        answer: "We recommend bringing 2-track instrumentals as high-quality WAV or AIFF files (24-bit/44.1kHz preferred). MP3s will work, but uncompressed audio yields the best results for mixing."
     }
 ];
 
-export const featuredSessions = [
+export const featuredSessions: FeaturedSession[] = [
     {
       id: 1,
       artist: 'The Wandering Souls',
       title: 'Riverstone',
       description: 'Acoustic track captured live off-the-floor with vintage ribbon mics to preserve warmth and intimacy.',
-      imageUrl: 'https://images.unsplash.com/photo-14954349422
+      imageUrl: 'https://images.unsplash.com/photo-1495434942214-9b5385ba883e?q=80&w=800&auto=format&fit=crop&fm=webp',
+      mediaUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/soft-and-dreamy-183350.mp3',
+      mediaType: 'audio'
+    },
+    {
+      id: 2,
+      artist: 'Static Bloom',
+      title: 'Neon Engines',
+      description: 'Full band rock production with multi-layered guitars and punchy drums from our custom kit.',
+      imageUrl: 'https://images.unsplash.com/photo-1549419895-c8430a911a7a?q=80&w=800&auto=format&fit=crop&fm=webp',
+      mediaUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/rock-it-213562.mp3',
+      mediaType: 'audio'
+    },
+    {
+      id: 3,
+      artist: 'j.wav',
+      title: 'Midnight Lo-Fi',
+      description: 'A smooth hip-hop instrumental created using our in-house collection of analog synths and drum machines.',
+      imageUrl: 'https://images.unsplash.com/photo-1593697821252-0c91d4a1a027?q=80&w=800&auto=format&fit=crop&fm=webp',
+      mediaUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/lofi-chill-15024.mp3',
+      mediaType: 'audio'
+    },
+    {
+        id: 4,
+        artist: 'The Tech Unfiltered Podcast',
+        title: 'Episode 42: AI in Audio',
+        description: 'Pristine dialogue from a multi-guest podcast, recorded with Shure SM7Bs for that classic broadcast sound.',
+        imageUrl: 'https://images.unsplash.com/photo-1557761271-9c3f46b35e0e?q=80&w=800&auto=format&fit=crop&fm=webp',
+        mediaUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/inspiring-cinematic-ambient-116199.mp3',
+        mediaType: 'audio'
+      },
+      {
+        id: 5,
+        artist: 'TAG Studios',
+        title: 'Cinematic Studio Tour',
+        description: 'A visual journey through our high-end facility, showcasing the gear and rooms that make our sound possible.',
+        imageUrl: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=800&auto=format&fit=crop&fm=webp',
+        mediaUrl: 'https://videos.pexels.com/video-files/5091632/5091632-uhd_2560_1440_25fps.mp4',
+        mediaType: 'video'
+      }
+  ];

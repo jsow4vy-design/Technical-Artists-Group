@@ -1,40 +1,72 @@
 
 import React from 'react';
 import { TwitterIcon, InstagramIcon, LinkedInIcon, YouTubeIcon } from './icons';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface FooterProps {
   onAdminLogin: () => void;
 }
 
 const Footer: React.FC<FooterProps> = ({ onAdminLogin }) => {
+  const currentYear = new Date().getFullYear();
+  const [studioName] = useLocalStorage<string>('tag_studio_name', 'UNDR:LA Studios');
+
   return (
-    <footer className="bg-black/50 border-t border-white/10 text-gray-400">
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-          <div className="flex items-center space-x-4">
+    <footer className="bg-black/80 backdrop-blur-md border-t border-white/10 text-gray-400 mt-auto">
+      <div className="max-w-7xl mx-auto py-8 px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4">
+          
+          {/* Copyright and Admin Links */}
+          <div className="flex flex-col items-center md:items-start gap-2 order-2 md:order-1">
+            <div className="flex items-center gap-4 text-xs font-medium uppercase tracking-widest text-gray-500">
+              <p>&copy; {currentYear} {studioName}</p>
+              <span className="w-1 h-1 bg-gray-700 rounded-full"></span>
+              <p>All Rights Reserved</p>
+            </div>
             <button 
               onClick={onAdminLogin}
-              className="text-sm text-gray-500 hover:text-cyan-400 transition-colors"
+              className="text-xs text-gray-600 hover:text-fuchsia-400 transition-colors duration-300 flex items-center gap-1 group"
             >
-              Admin Login
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity">/</span>
+              ADMIN PORTAL
             </button>
-            <p className="text-sm">&copy; {new Date().getFullYear()} Technical Artists Group. All Rights Reserved.</p>
           </div>
           
-          <div className="flex space-x-6">
-            <a href="#" className="hover:text-white transition-colors" aria-label="Twitter">
-              <TwitterIcon className="h-6 w-6" />
+          {/* Social Links Container */}
+          <nav className="flex items-center justify-center gap-6 order-1 md:order-2" aria-label="Social Media">
+            <a 
+              href="#" 
+              className="p-2 text-gray-500 hover:text-white hover:scale-125 transition-all duration-300 ease-out" 
+              aria-label="Follow us on Twitter"
+            >
+              <TwitterIcon className="h-5 w-5" />
             </a>
-            <a href="https://www.instagram.com/technicalartistsgroup" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="Instagram">
-              <InstagramIcon className="h-6 w-6" />
+            <a 
+              href="https://www.instagram.com/technicalartistsgroup" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="p-2 text-gray-500 hover:text-fuchsia-400 hover:scale-125 transition-all duration-300 ease-out" 
+              aria-label="Follow us on Instagram"
+            >
+              <InstagramIcon className="h-5 w-5" />
             </a>
-            <a href="#" className="hover:text-white transition-colors" aria-label="LinkedIn">
-              <LinkedInIcon className="h-6 w-6" />
+            <a 
+              href="#" 
+              className="p-2 text-gray-500 hover:text-blue-400 hover:scale-125 transition-all duration-300 ease-out" 
+              aria-label="Connect with us on LinkedIn"
+            >
+              <LinkedInIcon className="h-5 w-5" />
             </a>
-            <a href="https://www.youtube.com/technicalartistsgroup" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="YouTube">
-                <YouTubeIcon className="h-6 w-6" />
+            <a 
+              href="https://www.youtube.com/technicalartistsgroup" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="p-2 text-gray-500 hover:text-red-500 hover:scale-125 transition-all duration-300 ease-out" 
+              aria-label="Subscribe to our YouTube channel"
+            >
+              <YouTubeIcon className="h-5 w-5" />
             </a>
-          </div>
+          </nav>
 
         </div>
       </div>

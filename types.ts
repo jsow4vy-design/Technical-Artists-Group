@@ -46,3 +46,23 @@ export interface Gallery {
   images: GalleryImage[];
   createdAt: string;
 }
+
+export interface TeamMember {
+  id: number;
+  name: string;
+  role: string;
+  categories: ('Team' | 'Artist')[];
+  imageUrl: string;
+  bio: string;
+  expertise: string[];
+}
+
+export interface FeaturedSession {
+  id: number;
+  artist: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  mediaUrl: string;
+  mediaType: 'audio' | 'video';
+}
