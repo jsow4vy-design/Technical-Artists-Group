@@ -34,7 +34,7 @@ export const studioTeam = [
         id: 1,
         name: 'Moe White',
         role: 'Lead Engineer & Artist',
-        imageUrl: 'https://images.unsplash.com/photo-1581599933458-2abc9b8c03b3?q=80&w=800&auto=format&fit=crop&fm=webp',
+        imageUrl: 'https://images.unsplash.com/photo-1581599933458-2abc9b8c03b3?q=80&w=400&auto=format&fit=crop&fm=webp&q=80',
         expertise: ['Analog Recording', 'Live Band Tracking', 'Vocal Production', 'Mixing'],
         categories: ['Team', 'Artist'],
         bio: 'With over 15 years in the industry, Moe is a disciple of classic Glyn Johns and Al Schmitt recording techniques. His work has been featured on Grammy-nominated albums, and he’s the go-to for artists wanting to capture raw, authentic energy on tape.'
@@ -43,7 +43,7 @@ export const studioTeam = [
         id: 2,
         name: 'j.wav',
         role: 'Producer/Engineer & Artist',
-        imageUrl: 'https://images.unsplash.com/photo-1629276301820-0f37c355e141?q=80&w=800&auto=format&fit=crop&fm=webp',
+        imageUrl: 'https://images.unsplash.com/photo-1629276301820-0f37c355e141?q=80&w=400&auto=format&fit=crop&fm=webp&q=80',
         expertise: ['Hip-Hop & Electronic Production', 'Beat Making', 'Sound Design', 'Live Streaming'],
         categories: ['Team', 'Artist'],
         bio: 'j.wav is the architect behind our modern sound. A master of DAWs and synths, he excels at building tracks from the ground up and curates our weekly DJ livestreams.'
@@ -52,7 +52,7 @@ export const studioTeam = [
         id: 3,
         name: 'Dee Strange',
         role: 'Rapper & Master Arranger',
-        imageUrl: 'https://images.unsplash.com/photo-1499415474447-8313a7c36a46?q=80&w=800&auto=format&fit=crop&fm=webp',
+        imageUrl: 'https://images.unsplash.com/photo-1499415474447-8313a7c36a46?q=80&w=400&auto=format&fit=crop&fm=webp&q=80',
         expertise: ['Melodic Rap', 'Arrangement', 'Songwriting', 'Vocal Production'],
         categories: ['Team', 'Artist'],
         bio: 'Dee is a rapper turned emo rap (melodic rap) master arranger, with over 300 unreleased tracks ready for release. He specializes in crafting infectious hooks and emotionally charged arrangements that define the new wave of hip-hop.'
@@ -61,7 +61,7 @@ export const studioTeam = [
         id: 4,
         name: 'INSANE',
         role: 'Tracking Engineer & Energy Architect',
-        imageUrl: 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?q=80&w=800&auto=format&fit=crop&fm=webp',
+        imageUrl: 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?q=80&w=400&auto=format&fit=crop&fm=webp&q=80',
         expertise: ['Heavy Metal', 'Punk', 'Distorted Textures', 'Live Energy'],
         categories: ['Team'],
         bio: 'Known for his relentless pursuit of the perfect take, INSANE specializes in aggressive genres where clarity and power are paramount. He brings a high-octane workflow to UNDR:LA, ensuring every session hits with maximum impact.'
@@ -70,7 +70,7 @@ export const studioTeam = [
         id: 5,
         name: 'Widow',
         role: 'Vocalist & Dark Pop Visionary',
-        imageUrl: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=800&auto=format&fit=crop&fm=webp',
+        imageUrl: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=400&auto=format&fit=crop&fm=webp&q=80',
         expertise: ['Dark Pop', 'Industrial', 'Melodic Arrangement', 'Songwriting'],
         categories: ['Artist'],
         bio: 'Widow is the ethereal voice of the underground. With a background in classical training and a passion for industrial electronics, she crafts haunting melodies that linger long after the track ends.'
@@ -136,7 +136,7 @@ export const featuredSessions: FeaturedSession[] = [
       artist: 'The Wandering Souls',
       title: 'Riverstone',
       description: 'Acoustic track captured live off-the-floor with vintage ribbon mics to preserve warmth and intimacy.',
-      imageUrl: 'https://images.unsplash.com/photo-1495434942214-9b5385ba883e?q=80&w=800&auto=format&fit=crop&fm=webp',
+      imageUrl: 'https://images.unsplash.com/photo-1495434942214-9b5385ba883e?q=80&w=600&auto=format&fit=crop&fm=webp&q=80',
       mediaUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/soft-and-dreamy-183350.mp3',
       mediaType: 'audio'
     },
@@ -145,7 +145,7 @@ export const featuredSessions: FeaturedSession[] = [
       artist: 'Static Bloom',
       title: 'Neon Engines',
       description: 'Full band rock production with multi-layered guitars and punchy drums from our custom kit.',
-      imageUrl: 'https://images.unsplash.com/photo-1549419895-c8430a911a7a?q=80&w=800&auto=format&fit=crop&fm=webp',
+      imageUrl: 'https://images.unsplash.com/photo-1549419895-c8430a911a7a?q=80&w=600&auto=format&fit=crop&fm=webp&q=80',
       mediaUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/rock-it-213562.mp3',
       mediaType: 'audio'
     },
@@ -154,7 +154,7 @@ export const featuredSessions: FeaturedSession[] = [
       artist: 'j.wav',
       title: 'Midnight Lo-Fi',
       description: 'A smooth hip-hop instrumental created using our in-house collection of analog synths and drum machines.',
-      imageUrl: 'https://images.unsplash.com/photo-1593697821252-0c91d4a1a027?q=80&w=800&auto=format&fit=crop&fm=webp',
+      imageUrl: 'https://images.unsplash.com/photo-1593697821252-0c91d4a1a027?q=80&w=600&auto=format&fit=crop&fm=webp&q=80',
       mediaUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/lofi-chill-15024.mp3',
       mediaType: 'audio'
     },
@@ -163,7 +163,7 @@ export const featuredSessions: FeaturedSession[] = [
         artist: 'The Tech Unfiltered Podcast',
         title: 'Episode 42: AI in Audio',
         description: 'Pristine dialogue from a multi-guest podcast, recorded with Shure SM7Bs for that classic broadcast sound.',
-        imageUrl: 'https://images.unsplash.com/photo-1557761271-9c3f46b35e0e?q=80&w=800&auto=format&fit=crop&fm=webp',
+        imageUrl: 'https://images.unsplash.com/photo-1557761271-9c3f46b35e0e?q=80&w=600&auto=format&fit=crop&fm=webp&q=80',
         mediaUrl: 'https://storage.googleapis.com/maker-media/assets/sounds/inspiring-cinematic-ambient-116199.mp3',
         mediaType: 'audio'
       },
@@ -172,7 +172,7 @@ export const featuredSessions: FeaturedSession[] = [
         artist: 'TAG Studios',
         title: 'Cinematic Studio Tour',
         description: 'A visual journey through our high-end facility, showcasing the gear and rooms that make our sound possible.',
-        imageUrl: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=800&auto=format&fit=crop&fm=webp',
+        imageUrl: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop&fm=webp&q=80',
         mediaUrl: 'https://videos.pexels.com/video-files/5091632/5091632-uhd_2560_1440_25fps.mp4',
         mediaType: 'video'
       }

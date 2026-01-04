@@ -4,6 +4,15 @@ export type Role = 'user' | 'model';
 export interface Message {
   role: Role;
   content: string;
+  visualAid?: VisualAidData;
+  generatedImageUrl?: string;
+}
+
+export interface VisualAidData {
+  type: 'frequency_response' | 'eq_curve' | 'compression';
+  title: string;
+  points: { f: number; g: number }[]; // f: frequency (20-20000), g: gain (-18 to +18 or 0 to 1)
+  labels?: { f: number; label: string }[];
 }
 
 export interface History {

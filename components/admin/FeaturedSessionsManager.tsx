@@ -443,16 +443,21 @@ export const FeaturedSessionsManager: React.FC<FeaturedSessionsManagerProps> = (
                 onDragEnter={(e) => handleDragEnter(e, index)}
                 onDragEnd={handleDragEnd}
                 onDragOver={handleDragOver}
-                className={`bg-gray-800/50 border rounded-xl p-3 flex items-center gap-4 transition-all duration-300 ${
-                    dragOverIndex === index 
-                        ? 'border-fuchsia-500 bg-fuchsia-500/10 scale-[1.03] shadow-[0_0_20px_rgba(217,70,239,0.2)] ring-2 ring-fuchsia-500/20' 
-                        : 'border-gray-800 hover:border-fuchsia-500/30'
-                } ${draggingIndex === index ? 'opacity-20 scale-95 grayscale' : 'opacity-100'}`}
+                className={`group bg-gray-800/50 border rounded-xl p-3 flex items-center gap-4 transition-all duration-300 relative overflow-hidden ${
+                    dragOverIndex === index && draggingIndex !== index
+                        ? 'border-fuchsia-500 bg-fuchsia-500/10 -translate-y-1 shadow-[0_10px_30px_rgba(217,70,239,0.3)] z-10' 
+                        : 'border-gray-800'
+                } ${draggingIndex === index ? 'opacity-10 scale-95 grayscale' : 'opacity-100'}`}
                 >
-                <div className="p-2 text-gray-600 hover:text-white cursor-grab active:cursor-grabbing"><DragHandleIcon className="w-5 h-5" /></div>
-                <div className="relative flex-shrink-0 group">
+                {/* Active Drop Target Highlight */}
+                {dragOverIndex === index && draggingIndex !== index && (
+                    <div className="absolute inset-0 border-2 border-fuchsia-400/50 rounded-xl animate-pulse pointer-events-none" />
+                )}
+                
+                <div className="p-2 text-gray-600 hover:text-white cursor-grab active:cursor-grabbing transition-colors"><DragHandleIcon className="w-5 h-5" /></div>
+                <div className="relative flex-shrink-0 group/img">
                     <img src={session.imageUrl} alt="" className="w-12 h-12 rounded object-cover border border-gray-700 drag-none pointer-events-none" />
-                    <button onClick={() => { setSessionToUpdateImage(session.id); setIsImagePickerOpen(true); }} className="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded">
+                    <button onClick={() => { setSessionToUpdateImage(session.id); setIsImagePickerOpen(true); }} className="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity rounded">
                         <span className="text-white text-[10px] font-bold">Swap</span>
                     </button>
                     <div className="absolute -top-1 -right-1 bg-black/80 px-1 rounded border border-gray-700">
@@ -460,12 +465,12 @@ export const FeaturedSessionsManager: React.FC<FeaturedSessionsManagerProps> = (
                     </div>
                 </div>
                 <div className="flex-grow min-w-0">
-                    <p className="font-bold text-white truncate text-sm">{session.title}</p>
+                    <p className="font-bold text-white truncate text-sm transition-colors group-hover:text-fuchsia-300">{session.title}</p>
                     <p className="text-xs text-gray-500 truncate">{session.artist}</p>
                 </div>
                 <div className="flex-shrink-0 flex items-center gap-1">
-                    <button onClick={() => setEditingSession(session)} className="p-2 text-gray-500 hover:text-cyan-400" title="Edit"><EditIcon className="w-4 h-4" /></button>
-                    <button onClick={() => handleDeleteSession(session.id)} className="p-2 text-gray-500 hover:text-red-500" title="Remove"><CloseIcon className="w-4 h-4" /></button>
+                    <button onClick={() => setEditingSession(session)} className="p-2 text-gray-500 hover:text-cyan-400 transition-colors" title="Edit"><EditIcon className="w-4 h-4" /></button>
+                    <button onClick={() => handleDeleteSession(session.id)} className="p-2 text-gray-500 hover:text-red-500 transition-colors" title="Remove"><CloseIcon className="w-4 h-4" /></button>
                 </div>
                 </li>
             ))}

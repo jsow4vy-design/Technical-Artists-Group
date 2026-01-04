@@ -1,31 +1,25 @@
 
 import React from 'react';
 import { TwitterIcon, InstagramIcon, LinkedInIcon, YouTubeIcon } from './icons';
-import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface FooterProps {
   onAdminLogin: () => void;
 }
 
 const Footer: React.FC<FooterProps> = ({ onAdminLogin }) => {
-  const currentYear = new Date().getFullYear();
-  const [studioName] = useLocalStorage<string>('tag_studio_name', 'UNDR:LA Studios');
-
   return (
     <footer className="bg-black/80 backdrop-blur-md border-t border-white/10 text-gray-400 mt-auto">
-      <div className="max-w-7xl mx-auto py-8 px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4">
+      <div className="max-w-7xl mx-auto py-12 px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-12 md:gap-4">
           
           {/* Copyright and Admin Links */}
-          <div className="flex flex-col items-center md:items-start gap-2 order-2 md:order-1">
-            <div className="flex items-center gap-4 text-xs font-medium uppercase tracking-widest text-gray-500">
-              <p>&copy; {currentYear} {studioName}</p>
-              <span className="w-1 h-1 bg-gray-700 rounded-full"></span>
-              <p>All Rights Reserved</p>
+          <div className="flex flex-col items-center md:items-start gap-4 order-2 md:order-1">
+            <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/30 text-center md:text-left">
+              <p>© 2026 UNDR:LA STUDIOS   -  ALL RIGHTS RESERVED</p>
             </div>
             <button 
               onClick={onAdminLogin}
-              className="text-xs text-gray-600 hover:text-fuchsia-400 transition-colors duration-300 flex items-center gap-1 group"
+              className="text-[9px] text-gray-700 hover:text-fuchsia-400 transition-colors duration-300 font-bold tracking-[0.2em] flex items-center gap-2 group"
             >
               <span className="opacity-0 group-hover:opacity-100 transition-opacity">/</span>
               ADMIN PORTAL

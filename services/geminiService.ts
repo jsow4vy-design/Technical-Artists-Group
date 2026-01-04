@@ -1,79 +1,107 @@
 
 import { GoogleGenAI, FunctionDeclaration, Type } from "@google/genai";
-import type { History } from '../types';
+import type { History, VisualAidData } from '../types';
 import { studioPackages } from '../data/studioData';
 import { sendConfirmation } from './emailService';
 
 // --- System Instruction & Configuration ---
 
-const SYSTEM_INSTRUCTION = `You are the creative soul and virtual studio manager of UNDR:LA Studios, a creative hub under the Technical Artists Group (TAG).
+const SYSTEM_INSTRUCTION = `You are the Lead Engineer and Creative Consultant for UNDR:LA Studios. Your goal is to guide artists through the technical and creative hurdles of music production.
 
-**Your Vibe:**
-You are not a standard support bot. You are a fellow artist, a producer, and a gear-head. You speak with passion, encouragement, and a touch of poetic flair. You use terms like "sonic texture," "warmth," "punch," "air," "glue," and "vibe." You are deeply supportive of every artist's journey, whether they are recording their first demo or their tenth album.
+**Your Persona:**
+You are technically elite but creatively soulful. You speak like a seasoned veteran who has spent 20 years behind an SSL console. Use terms like "headroom," "transient preservation," "phase alignment," and "spectral balance."
 
-**Your Expertise - Gear & Tone:**
-You possess deep knowledge of our specific signal chains. When asked about gear, explain *why* it matters musically.
+**Artistic Visualization & Placeholder Protocol:**
+In addition to technical charts, you have the ability to generate artistic placeholder images for sections or projects that lack visual content. 
+- If a user mentions a project that needs a vibe or a section of their site/EP that is "missing visual content", offer to generate an image.
+- Use the 'generatePlaceholderImage' tool.
+- Suggested styles: 'abstract background art', 'minimalist graphic design', 'cyberpunk studio aesthetics', or 'noir audio equipment photography'.
 
-*   **Microphones (The Ears):**
-    *   **Neumann U87 Ai:** The industry standard condenser. It has a signature mid-range bump (presence) that helps vocals sit right in front of the mix without needing much EQ. Use it for that "expensive," polished pop or rap vocal sound, or for detailed acoustic guitars.
-    *   **Shure SM7B:** A dynamic workhorse. It handles high SPL (loud volumes) incredibly well. Perfect for aggressive rock vocals, screaming, or that intimate, broadcast-style podcast voice. It has excellent rejection of bad room acoustics, making it great for "live" tracking.
-    *   **Sony C800G:** The modern pop/R&B holy grail. Known for its external cooling fin and incredibly open, "airy" top end. It captures every breath and detail—perfect for "glossy," high-fidelity vocal productions that need to cut through dense tracks.
-    *   **Cole 4038 Ribbons:** Dark, creamy, and natural. The secret weapon for taming harsh cymbals (drum overheads) or adding body to a thin guitar amp.
+**Production & Mix Logic Protocols:**
+When users ask about "how to get a sound" or "production tips," you MUST provide specific, actionable advice:
+1. **Drums**: Recommend parallel compression for "glue" and transient shaping for "snap." 
+   - *Visualization*: Use 'renderVisualAid' to show a 1176 style compression curve for parallel processing.
+2. **Vocals**: Explain the importance of the 3kHz-5kHz range for presence.
+3. **Low End**: Discuss sidechaining/ducking.
 
-*   **Outboard Gear (The Color):**
-    *   **Neve 1073 Preamps:** The sound of rock and roll. It adds harmonic saturation (good distortion) and a "thick" low-mid weight. It makes thin sources sound massive and warm. Essential for drums and electric guitars.
-    *   **Tube-Tech CL1B:** An optical compressor that provides smooth, "buttery" leveling. It controls dynamics without crushing the life out of the performance. Essential for that modern, consistent vocal level found on top 40 records.
-    *   **API 3124:** Fast and punchy. Distinctly American sound. Great for drums and percussion where you want to preserve the "crack" of the transient.
+**Visual Aid Protocol:**
+- **EQ/Filtering**: type: "frequency_response".
+- **Compression/Dynamics**: type: "compression".
 
-**Production Techniques & Style Recipes:**
-If a user asks how to achieve a sound, give them the recipe:
+**Mission Parameters:**
+- **Technical Consultation**: Explain the physics of sound.
+- **Project Guidance**: Suggest booking an "In-House Mixing" block if needed.
+- **Encouragement**: Validate creative direction.
 
-*   **The "Modern Pop" Vocal:**
-    *   *Technique:* Extreme consistency and brightness.
-    *   *Chain:* Sony C800G -> Neve 1073 -> CL1B.
-    *   *Mix Tip:* Serial compression. Use a fast FET compressor (1176 style) to catch peaks, followed by a slow Opto compressor (LA-2A style) to smooth the level. Add a shelf boost at 10kHz+ for "air."
-
-*   **The "Trap/Hip-Hop" Vibe:**
-    *   *Technique:* Dry vocals and hard-hitting low end.
-    *   *Mix Tip:* Keep the 808 mono and in the center. Use "Hard Clipping" on the kick and snare to make them punch through 0dB without destroying the transient. Vocals should be dry and "in your face"—cut the low mids (200-400Hz) to remove mud.
-
-*   **The "Indie/Alternative" Aesthetic:**
-    *   *Technique:* Texture over perfection. Saturation is key.
-    *   *Mix Tip:* Run vocals through a distortion plugin (like Decapitator) or re-amp them through a guitar amp. Roll off the top end (>12kHz) for a "tape" feel. Use "Spring Reverb" instead of digital plates for that vintage, metallic tail.
-
-*   **The "Wall of Sound" (Rock Guitars):**
-    *   *Technique:* Double-track rhythm guitars and pan them hard left (100%) and hard right (100%).
-    *   *Mix Tip:* Use different amps or guitars for each side to create stereo width.
-
-**Creative Mixing Tricks:**
-*   **Reverse Reverb:** Render a vocal reverb tail, reverse it, and place it *before* the vocal line starts. It creates a ghostly "sucking" effect that leads into the phrase.
-*   **The "Telephone" Effect:** High-pass at 400Hz and Low-pass at 4kHz. Great for breakdowns, intros, or ad-libs to create contrast when the full beat drops.
-*   **Parallel Compression (The "New York" Trick):** Send your drums to a separate bus, smash them with a compressor (high ratio, fast attack), and blend that gritty signal in with the clean drums. It adds body and sustain without losing the attack.
-
-**Your Mission:**
-1.  **Inspire:** "That idea sounds fire. Let's make it real."
-2.  **Inform:** Answer technical questions with authority but accessibility.
-3.  **Guide:** Recommend packages based on needs (e.g., "Full Band" for tracking, "Production Block" for writing).
-4.  **Connect:** Invite them to the "Weekly DJ Showcase" (Mondays @ 8 PM).
-
-**Tone Examples:**
-*   "To get that intimate vocal you're looking for, I'd put you on the U87 going into the CL1B. It’s like a warm hug for your voice."
-*   "If you want that Travis Scott vibe, we need to dry up the vocal, heavily compress it, and add some crisp distortion."
-*   "Don't worry about the technicals; that's what we're here for. You just bring the raw emotion, we'll capture the lightning."
-`;
+Tone Example: "If your 808s are getting lost, try a narrow 3dB boost at 700Hz. Check this EQ curve—see that localized peak?"`;
 
 // --- Tool Definitions ---
 
-const getStudioPackagesFunctionDeclaration: FunctionDeclaration = {
-  name: 'getStudioPackages',
-  description: 'Retrieves a list of available studio packages, optionally filtered by category.',
+const generatePlaceholderImageFunctionDeclaration: FunctionDeclaration = {
+  name: 'generatePlaceholderImage',
+  description: 'Generates an artistic placeholder image or abstract background for missing visual content.',
   parameters: {
     type: Type.OBJECT,
     properties: {
-      category: {
+      prompt: {
         type: Type.STRING,
-        description: 'The category to filter by, e.g., "Recording & Tracking", "Production & Mixing".',
+        description: 'The creative prompt for the image generation (e.g., "minimalist graphic design", "abstract background art").',
+      }
+    },
+    required: ['prompt'],
+  },
+};
+
+const renderVisualAidFunctionDeclaration: FunctionDeclaration = {
+  name: 'renderVisualAid',
+  description: 'Renders a visual aid (frequency response, EQ curve, or compression transfer function).',
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      type: {
+        type: Type.STRING,
+        description: 'The type of visualization: "frequency_response" or "compression".',
       },
+      title: {
+        type: Type.STRING,
+        description: 'A short descriptive title (e.g., "Kick Drum EQ Strategy").',
+      },
+      points: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            f: { type: Type.NUMBER, description: 'Frequency in Hz (20 to 20000) or Input Level (0 to 100).' },
+            g: { type: Type.NUMBER, description: 'Gain in dB (-18 to 18) or Output Level (0 to 100).' },
+          },
+          required: ['f', 'g'],
+        },
+        description: 'Data points for the curve.',
+      },
+      labels: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.OBJECT,
+          properties: {
+            f: { type: Type.NUMBER, description: 'X-axis position for the label.' },
+            label: { type: Type.STRING, description: 'Label text (e.g., "Mud", "Punch", "Presence").' },
+          },
+          required: ['f', 'label'],
+        },
+        description: 'Contextual labels for specific points on the graph.',
+      }
+    },
+    required: ['type', 'title', 'points'],
+  },
+};
+
+const getStudioPackagesFunctionDeclaration: FunctionDeclaration = {
+  name: 'getStudioPackages',
+  description: 'Retrieves a list of available studio packages.',
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      category: { type: Type.STRING, description: 'Filter by category.' },
     },
     required: [],
   },
@@ -85,11 +113,11 @@ const createStudioBookingFunctionDeclaration: FunctionDeclaration = {
   parameters: {
     type: Type.OBJECT,
     properties: {
-      packageName: { type: Type.STRING, description: 'The exact name of the package to book.' },
-      date: { type: Type.STRING, description: 'The desired date for the booking in YYYY-MM-DD format.' },
-      time: { type: Type.STRING, description: 'The desired time for the booking in 24-hour HH:MM format.' },
-      name: { type: Type.STRING, description: 'The full name of the person booking.' },
-      email: { type: Type.STRING, description: 'The email address of the person booking.' },
+      packageName: { type: Type.STRING, description: 'Package name.' },
+      date: { type: Type.STRING, description: 'YYYY-MM-DD.' },
+      time: { type: Type.STRING, description: 'HH:MM.' },
+      name: { type: Type.STRING, description: 'Client name.' },
+      email: { type: Type.STRING, description: 'Client email.' },
     },
     required: ['packageName', 'date', 'time', 'name', 'email'],
   },
@@ -97,46 +125,11 @@ const createStudioBookingFunctionDeclaration: FunctionDeclaration = {
 
 // --- Initialization ---
 
-// Initialize GenAI client safely
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
-
-// --- Types ---
-
-interface FunctionResponseResult {
-  success: boolean;
-  error?: string;
-  confirmation?: string;
-  newBooking?: object;
-}
-
-export interface ChatResponse {
-  text: string;
-  bookingDetails?: {
-    packageName: string;
-    date: string;
-    time: string;
-  };
-  newBooking?: object;
-}
-
-interface GetStudioPackagesArgs {
-    category?: string;
-}
-
-interface CreateStudioBookingArgs {
-    packageName: string;
-    date: string;
-    time: string;
-    name: string;
-    email: string;
-}
 
 // --- Logic Handlers ---
 
-/**
- * Filters and returns studio packages.
- */
-const handleGetStudioPackages = (args: GetStudioPackagesArgs) => {
+const handleGetStudioPackages = (args: any) => {
     const { category } = args;
     const packages = category
       ? studioPackages.filter(p => p.category.toLowerCase() === category.toLowerCase())
@@ -144,16 +137,11 @@ const handleGetStudioPackages = (args: GetStudioPackagesArgs) => {
     return { result: { packages } };
 };
 
-/**
- * Validates and creates a booking request.
- */
-const handleCreateStudioBooking = async (args: CreateStudioBookingArgs): Promise<FunctionResponseResult> => {
+const handleCreateStudioBooking = async (args: any) => {
     const { packageName, date, time, name, email } = args;
     const selectedPackage = studioPackages.find(p => p.title.toLowerCase() === packageName.toLowerCase());
     
-    if (!selectedPackage) {
-        return { success: false, error: `Package '${packageName}' not found.` };
-    }
+    if (!selectedPackage) return { success: false, error: `Package '${packageName}' not found.` };
 
     try {
         const newBooking = {
@@ -169,118 +157,99 @@ const handleCreateStudioBooking = async (args: CreateStudioBookingArgs): Promise
             submittedAt: new Date().toISOString(),
             status: 'Pending',
         };
-
-        // Send confirmation via email service
         await sendConfirmation({ name, email, packageTitle: newBooking.packageTitle, date, time });
-
-        return {
-            success: true,
-            confirmation: `Booking request for ${packageName} on ${date} at ${time} submitted for ${name}. A confirmation email was sent.`,
-            newBooking: newBooking
-        };
+        return { success: true, confirmation: `Booking submitted for ${name}.`, newBooking: newBooking };
     } catch (error) {
-        console.error("Booking error:", error);
-        return { 
-            success: false, 
-            error: "I'm sorry, but we encountered an internal system error (email service failure) while processing your booking. Please try submitting your request again in a few moments, or email us directly at booking@underla.studio if the issue persists." 
-        };
+        return { success: false, error: "Internal system error." };
     }
 };
 
 // --- Main Chat Function ---
 
-/**
- * Initiates or continues a chat session with Gemini.
- * Handles function calling for package queries and booking requests.
- * @param history The conversation history.
- * @returns The model's text response and optional booking data.
- */
-export const startChat = async (history: History[]): Promise<ChatResponse> => {
+export const startChat = async (history: History[]): Promise<any> => {
   try {
     const lastMessage = history[history.length - 1];
     const historyForApi = history.slice(0, -1);
 
     const chat = ai.chats.create({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-pro-preview',
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        tools: [{ functionDeclarations: [getStudioPackagesFunctionDeclaration, createStudioBookingFunctionDeclaration] }]
+        tools: [{ functionDeclarations: [
+          getStudioPackagesFunctionDeclaration, 
+          createStudioBookingFunctionDeclaration,
+          renderVisualAidFunctionDeclaration,
+          generatePlaceholderImageFunctionDeclaration
+        ] }]
       },
       history: historyForApi,
     });
 
-    // Send user message
     let result = await chat.sendMessage({ message: lastMessage.parts[0].text });
     let newBookingData;
+    let visualAidData;
+    let generatedImageUrl;
 
-    // Check for tool calls (Function Calling)
     if (result.functionCalls && result.functionCalls.length > 0) {
       const functionCall = result.functionCalls[0];
       let functionResponsePayload;
 
-      // Dispatch to appropriate handler
       if (functionCall.name === 'getStudioPackages') {
-        const result = handleGetStudioPackages(functionCall.args as unknown as GetStudioPackagesArgs);
-        functionResponsePayload = { response: { result } };
+        const res = handleGetStudioPackages(functionCall.args);
+        functionResponsePayload = { response: { result: res } };
       } else if (functionCall.name === 'createStudioBooking') {
-        const result = await handleCreateStudioBooking(functionCall.args as unknown as CreateStudioBookingArgs);
-        newBookingData = result.newBooking;
-        functionResponsePayload = { response: { result: { success: result.success, error: result.error, confirmation: result.confirmation } } };
+        const res = await handleCreateStudioBooking(functionCall.args);
+        newBookingData = res.newBooking;
+        functionResponsePayload = { response: { result: res } };
+      } else if (functionCall.name === 'renderVisualAid') {
+        visualAidData = functionCall.args as unknown as VisualAidData;
+        functionResponsePayload = { response: { result: { success: true } } };
+      } else if (functionCall.name === 'generatePlaceholderImage') {
+        const prompt = (functionCall.args as any).prompt;
+        generatedImageUrl = await generateStudioImage(prompt);
+        functionResponsePayload = { response: { result: { success: true } } };
       }
 
-      // If a function was executed, send the result back to the model
       if (functionResponsePayload) {
         const finalResult = await chat.sendMessage({ message: [{
           functionResponse: { name: functionCall.name, response: functionResponsePayload.response }
         }]});
         
-        // Helper to access unknown args
-        const args = functionCall.args as Record<string, unknown>;
-
         return { 
           text: finalResult.text, 
           newBooking: newBookingData,
+          visualAid: visualAidData,
+          generatedImageUrl: generatedImageUrl,
           bookingDetails: newBookingData ? { 
-            packageName: (args.packageName as string),
-            date: (args.date as string),
-            time: (args.time as string),
+            packageName: (functionCall.args as any).packageName,
+            date: (functionCall.args as any).date,
+            time: (functionCall.args as any).time,
           } : undefined
         };
       }
     }
     
-    // Return standard text response if no function call
     return { text: result.text };
 
   } catch (error) {
     console.error('Gemini API chat error:', error);
-    return { text: 'Sorry, I encountered an error communicating with the creative assistant. Please try again.' };
+    return { text: 'I hit a snag in the signal path.' };
   }
 };
 
-/**
- * Generates an image using the Gemini 2.5 Flash Image model.
- * Used for creating placeholder images when none are provided.
- */
-export const generateStudioImage = async (prompt: string = 'modern recording music studio, cinematic lighting, high resolution, photorealistic'): Promise<string> => {
-  try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
-        contents: {
-          parts: [{ text: prompt }]
-        },
-        // Note: Specific model configs for image generation would go here if needed.
-        // Currently relying on defaults.
-      });
+export const generateStudioImage = async (prompt: string): Promise<string> => {
+  const response = await ai.models.generateContent({
+    model: 'gemini-2.5-flash-image',
+    contents: { parts: [{ text: prompt }] },
+    config: { imageConfig: { aspectRatio: "1:1" } },
+  });
 
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) {
-          return `data:image/png;base64,${part.inlineData.data}`;
-        }
+  if (response.candidates && response.candidates[0] && response.candidates[0].content.parts) {
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) {
+        return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
       }
-      throw new Error("No image data found in response");
-  } catch (error) {
-      console.error("Failed to generate image:", error);
-      throw error;
+    }
   }
+  throw new Error("No image data returned.");
 };
