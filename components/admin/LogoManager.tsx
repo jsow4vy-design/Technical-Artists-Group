@@ -4,7 +4,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { UploadIcon, LoadingSpinnerIcon, RefreshIcon } from '../icons';
 import { Input } from '../FormControls';
 
-const DEFAULT_LOGO_URL = 'https://i.imgur.com/x02n31a.png';
+const DEFAULT_LOGO_URL = 'https://i.imgur.com/mlJHumZ.png';
 const DEFAULT_STUDIO_NAME = 'UNDR:LA Studios';
 const MAX_SIZE_MB = 2;
 
@@ -54,7 +54,7 @@ export const LogoManager: React.FC<{ addToast: (message: string) => void }> = ({
     };
 
     return (
-        <section className="space-y-8">
+        <section className="space-y-8 animate-fade-in">
             <h2 className="text-3xl font-bold uppercase tracking-widest text-white mb-6">Brand Identity</h2>
             
             {/* Studio Name Input */}
@@ -73,8 +73,14 @@ export const LogoManager: React.FC<{ addToast: (message: string) => void }> = ({
 
             {/* Logo Manager */}
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 flex flex-col sm:flex-row items-center gap-8">
-                <div className="flex-shrink-0 bg-black p-4 rounded-lg border border-gray-700 flex items-center justify-center w-48 h-32">
-                    <img src={logoUrl} alt="Current Site Logo" className="max-w-full max-h-full object-contain" />
+                {/* Preview with Transparency Grid */}
+                <div className="flex-shrink-0 relative w-64 h-40 bg-[#1a1a1a] rounded-lg border border-gray-700 overflow-hidden flex items-center justify-center">
+                    <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                         backgroundImage: 'linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%)',
+                         backgroundSize: '20px 20px',
+                         backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px'
+                    }}></div>
+                    <img src={logoUrl} alt="Current Site Logo" className="relative z-10 max-w-full max-h-full object-contain p-4" />
                 </div>
                 
                 <div className="flex-grow space-y-4">
@@ -82,7 +88,7 @@ export const LogoManager: React.FC<{ addToast: (message: string) => void }> = ({
                          <p className="text-gray-300 mb-2 font-semibold">Site Logo</p>
                          <p className="text-xs text-gray-500 mb-4">Recommended: PNG with transparent background. Max 2MB.</p>
                          
-                         <div className="flex flex-wrap gap-4">
+                         <div className="flex flex-wrap gap-4 items-center">
                             <input 
                                 ref={fileInputRef}
                                 type="file" 
@@ -93,7 +99,7 @@ export const LogoManager: React.FC<{ addToast: (message: string) => void }> = ({
                             />
                             <label 
                                 htmlFor="logo-upload"
-                                className={`flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-bold rounded-full cursor-pointer hover:scale-105 transition-transform ${isUploading ? 'opacity-50 cursor-wait' : ''}`}
+                                className={`flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-bold rounded-full cursor-pointer hover:scale-105 transition-transform shadow-lg shadow-cyan-500/20 ${isUploading ? 'opacity-50 cursor-wait' : ''}`}
                             >
                                 {isUploading ? <LoadingSpinnerIcon /> : <UploadIcon className="w-5 h-5" />}
                                 <span>{isUploading ? 'Uploading...' : 'Upload New Logo'}</span>
@@ -102,10 +108,10 @@ export const LogoManager: React.FC<{ addToast: (message: string) => void }> = ({
                             {logoUrl !== DEFAULT_LOGO_URL && (
                                 <button 
                                     onClick={handleResetLogo}
-                                    className="flex items-center gap-2 px-6 py-2 bg-gray-700 text-gray-300 font-bold rounded-full hover:bg-gray-600 transition-colors"
+                                    className="flex items-center gap-2 px-6 py-2 bg-gray-700 text-gray-300 font-bold rounded-full hover:bg-red-500/20 hover:text-red-400 hover:border-red-500 border border-transparent transition-all"
                                 >
                                     <RefreshIcon className="w-4 h-4" />
-                                    <span>Reset Default</span>
+                                    <span>Reset to Default</span>
                                 </button>
                             )}
                          </div>

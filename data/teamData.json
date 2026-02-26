@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "name": "Moe White",
+        "role": "Lead Engineer & Artist",
+        "imageUrl": "https://images.unsplash.com/photo-1581599933458-2abc9b8c03b3?q=80&w=400&auto=format&fit=crop&fm=webp&q=80",
+        "expertise": ["Analog Recording", "Live Band Tracking", "Vocal Production", "Mixing"],
+        "categories": ["Team", "Artist"],
+        "bio": "With over 15 years in the industry, Moe is a disciple of classic Glyn Johns and Al Schmitt recording techniques. His work has been featured on Grammy-nominated albums, and he’s the go-to for artists wanting to capture raw, authentic energy on tape."
+    },
+    {
+        "id": 2,
+        "name": "j.wav",
+        "role": "Producer/Engineer & Artist",
+        "imageUrl": "https://images.unsplash.com/photo-1629276301820-0f37c355e141?q=80&w=400&auto=format&fit=crop&fm=webp&q=80",
+        "expertise": ["Hip-Hop & Electronic Production", "Beat Making", "Sound Design", "Live Streaming"],
+        "categories": ["Team", "Artist"],
+        "bio": "j.wav is the architect behind our modern sound. A master of DAWs and synths, he excels at building tracks from the ground up and curates our weekly DJ livestreams."
+    },
+    {
+        "id": 3,
+        "name": "Dee Strange",
+        "role": "Rapper, Songwriter, Lyricist & Master Arranger",
+        "imageUrl": "https://images.unsplash.com/photo-1499415474447-8313a7c36a46?q=80&w=400&auto=format&fit=crop&fm=webp&q=80",
+        "expertise": ["Melodic Rap", "Arrangement", "Songwriting", "Vocal Production"],
+        "categories": ["Team", "Artist"],
+        "bio": "Dee is a rapper turned emo rap (melodic rap) master arranger, with over 300 unreleased tracks ready for release. He specializes in crafting infectious hooks and emotionally charged arrangements that define the new wave of hip-hop."
+    },
+    {
+        "id": 6,
+        "name": "PnuTs",
+        "role": "Studio Manager & Overseer",
+        "imageUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop&fm=webp&q=80",
+        "expertise": ["Studio Management", "Operations", "Client Relations", "Facility Upkeep"],
+        "categories": ["Team"],
+        "bio": "PnuTs is the backbone of UNDR:LA, overseeing daily operations, managing the facility, and ensuring the space is always pristine and ready for creativity. He keeps a watchful eye on everything to guarantee a seamless experience for every artist."
+    }
+]

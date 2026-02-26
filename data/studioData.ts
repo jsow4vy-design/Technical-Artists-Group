@@ -8,6 +8,10 @@ export const studioPackages = [
     { id: 3, category: "Recording & Tracking", title: "Drum Tracking", price: 150, priceDisplay: "$150", details: ["4-hour session", "Access to studio kit & mics", "World-class acoustic space", "Raw multitracks provided"], description: "Get massive, punchy drum sounds for your project. Bring your own engineer." },
     { id: 16, category: "Recording & Tracking", title: "4-Hour Dry Hire Block", price: 200, priceDisplay: "$200", details: ["4-hour session", "Access to live room & control room", "Use your own laptop & interface", "Bring your own engineer"], description: "The perfect blank canvas. You get our world-class rooms; you bring the personnel." },
     { id: 12, category: "Recording & Tracking", title: "Studio Rehearsal", price: 60, priceDisplay: "$60 / hour", details: ["Access to live room & PA", "Get comfortable with the space", "Dial in monitor mixes", "A pro space to practice"], description: "Practice in a professional environment with a top-tier sound system." },
+    { id: 20, category: "Recording & Tracking", title: "Vocal Production Session", price: 180, priceDisplay: "$180", details: ["4-hour session", "Dedicated vocal booth", "Advanced vocal comping & tuning", "High-end mic locker access"], description: "Focus entirely on getting the perfect vocal take with our specialized vocal producers." },
+    { id: 21, category: "Recording & Tracking", title: "Live Acoustic Session", price: 250, priceDisplay: "$250", details: ["4-hour block", "Intimate room setup", "Stereo ribbon mic techniques", "Perfect for acoustic duos/trios"], description: "Capture the natural warmth and intimacy of acoustic instruments in our treated live room." },
+    { id: 26, category: "Recording & Tracking", title: "Analog Tape Tracking", price: 400, priceDisplay: "$400", details: ["Track directly to 2-inch tape", "Vintage analog warmth", "Studer A827 tape machine", "Tape cost not included"], description: "Experience the magic of true analog recording. Perfect for bands wanting that classic 70s sound." },
+    { id: 27, category: "Recording & Tracking", title: "Choir / Ensemble Tracking", price: 350, priceDisplay: "$350", details: ["Large live room access", "Multi-mic array setup", "Up to 15 vocalists", "Conductor video monitor"], description: "Spacious and acoustically treated environment ideal for capturing large vocal groups or string ensembles." },
     
     // Production & Mixing (5 packages)
     { id: 4, category: "Production & Mixing", title: "Single Song Production Block", price: 750, priceDisplay: "$750", details: ["Full day (8-hour) studio lockout", "Access to all mics, instruments & software", "Pre-production consultation (30 mins)", "Ideal for artists with their own engineer"], description: "A full day dedicated to bringing one song to life. You run the session." },
@@ -15,12 +19,20 @@ export const studioPackages = [
     { id: 17, category: "Production & Mixing", title: "Music Video Production + BTS", price: 1200, priceDisplay: "$1,200", details: ["Full day (8-hour) studio lockout", "4K multi-camera video shoot", "Behind-the-scenes photographer", "Basic lighting package included"], description: "Create a stunning music video and get all the social content you need in one session." },
     { id: 13, category: "Production & Mixing", title: "In-House Mastering (per song)", price: 100, priceDisplay: "$100", details: ["Final polish and loudness optimization", "High-end analog & digital gear", "2 revisions included", "Delivery for all streaming platforms"], description: "The crucial final step to make your music sound great everywhere." },
     { id: 6, category: "Production & Mixing", title: "In-House Mixing (per song)", price: 250, priceDisplay: "$250", details: ["Stems mixing by our house engineer", "2 revisions included", "Analog summing for warmth", "Master-ready WAV file"], description: "Let our experienced engineers give your track a professional, polished sound." },
+    { id: 22, category: "Production & Mixing", title: "Custom Beat Production", price: 500, priceDisplay: "$500", details: ["Exclusive custom instrumental", "Collaborative beat-making session", "Full stems provided", "Commercial rights included"], description: "Work 1-on-1 with our producers to craft a unique instrumental tailored to your style." },
+    { id: 23, category: "Production & Mixing", title: "Dolby Atmos Spatial Mix", price: 400, priceDisplay: "$400", details: ["Immersive 3D audio mix", "Apple Music ready", "Binaural headphone render", "Requires existing multitracks"], description: "Take your track to the next dimension with a fully immersive Dolby Atmos spatial audio mix." },
+    { id: 28, category: "Production & Mixing", title: "Full Album Mixing Bundle", price: 2000, priceDisplay: "$2,000", details: ["Mix up to 10 songs", "Consistent sonic character", "Analog outboard processing", "3 revisions per song"], description: "A comprehensive mixing package to ensure your entire album sounds cohesive and massive." },
+    { id: 29, category: "Production & Mixing", title: "Vocal Tuning & Cleanup", price: 75, priceDisplay: "$75 / song", details: ["Melodyne pitch correction", "Sibilance & breath control", "Time alignment", "Delivered as dry stems"], description: "Professional vocal editing to get your raw takes ready for the final mix." },
 
     // Podcasting & Voice Over (4 packages)
     { id: 7, category: "Podcasting & Voice Over", title: "Podcast Quick Start", price: 80, priceDisplay: "$80", details: ["1-hour recording session", "Up to 2 hosts", "Professional mics & headphones", "Raw audio files provided"], description: "Record your podcast episode with pristine audio quality. Just show up and talk." },
     { id: 8, category: "Podcasting & Voice Over", title: "Video Podcast Package", price: 250, priceDisplay: "$250", details: ["2-hour session", "3-camera 4K setup", "Professional lighting", "Synced audio & video files"], description: "Elevate your podcast with high-quality video. We handle the tech." },
     { id: 9, category: "Podcasting & Voice Over", title: "Voice Over Demo Reel", price: 200, priceDisplay: "$200", details: ["2-hour session", "Access to script library", "Engineer to direct & record", "Edited & master-ready files"], description: "Create a professional voice-over demo that stands out to casting directors." },
     { id: 14, category: "Podcasting & Voice Over", title: "Audiobook Recording Block", price: 250, priceDisplay: "$250", details: ["4-hour recording block", "Ultra-quiet vocal booth", "Engineer to monitor levels", "Punch-and-roll recording"], description: "Comfortable and professional space for narrating your audiobook." },
+    { id: 24, category: "Podcasting & Voice Over", title: "Podcast Season Lockout", price: 1500, priceDisplay: "$1,500", details: ["10-hour block (split over 2 days)", "Record up to 8 episodes", "Consistent audio setup", "Bulk discount applied"], description: "Batch record your entire podcast season in a professional, distraction-free environment." },
+    { id: 25, category: "Podcasting & Voice Over", title: "ADR & Post-Production", price: 120, priceDisplay: "$120 / hour", details: ["Video sync playback", "Ultra-quiet isolation booth", "Source-Connect available", "Dialogue editing included"], description: "Professional Automated Dialogue Replacement and voice-over for film, TV, and commercials." },
+    { id: 30, category: "Podcasting & Voice Over", title: "Remote Interview Setup", price: 100, priceDisplay: "$100 / hour", details: ["High-quality remote link", "Mix-minus routing", "Phone patch available", "Backup local recording"], description: "Conduct flawless remote interviews with guests anywhere in the world using our broadcast-grade setup." },
+    { id: 31, category: "Podcasting & Voice Over", title: "Podcast Editing & Polish", price: 150, priceDisplay: "$150 / episode", details: ["Remove umms and dead air", "Level balancing (LUFS)", "Intro/Outro music integration", "Noise reduction"], description: "Send us your raw podcast audio and we'll return a radio-ready, polished episode." },
 
     // Engineer Add-ons (3 packages)
     { id: 10, category: "Engineer Add-ons", title: "Studio Engineer (Hourly)", price: 50, priceDisplay: "+$50 / hour", details: ["Add a professional engineer to any session", "Expertise in our gear & workflow", "Focus on your performance", "Minimum 3 hours"], description: "Let our pros handle the technical side so you can focus on creativity." },
@@ -51,29 +63,20 @@ export const studioTeam = [
     {
         id: 3,
         name: 'Dee Strange',
-        role: 'Rapper & Master Arranger',
+        role: 'Rapper, Songwriter, Lyricist & Master Arranger',
         imageUrl: 'https://images.unsplash.com/photo-1499415474447-8313a7c36a46?q=80&w=400&auto=format&fit=crop&fm=webp&q=80',
         expertise: ['Melodic Rap', 'Arrangement', 'Songwriting', 'Vocal Production'],
         categories: ['Team', 'Artist'],
         bio: 'Dee is a rapper turned emo rap (melodic rap) master arranger, with over 300 unreleased tracks ready for release. He specializes in crafting infectious hooks and emotionally charged arrangements that define the new wave of hip-hop.'
     },
     {
-        id: 4,
-        name: 'INSANE',
-        role: 'Tracking Engineer & Energy Architect',
-        imageUrl: 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?q=80&w=400&auto=format&fit=crop&fm=webp&q=80',
-        expertise: ['Heavy Metal', 'Punk', 'Distorted Textures', 'Live Energy'],
+        id: 6,
+        name: 'PnuTs',
+        role: 'Studio Manager & Overseer',
+        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop&fm=webp&q=80',
+        expertise: ['Studio Management', 'Operations', 'Client Relations', 'Facility Upkeep'],
         categories: ['Team'],
-        bio: 'Known for his relentless pursuit of the perfect take, INSANE specializes in aggressive genres where clarity and power are paramount. He brings a high-octane workflow to UNDR:LA, ensuring every session hits with maximum impact.'
-    },
-    {
-        id: 5,
-        name: 'Widow',
-        role: 'Vocalist & Dark Pop Visionary',
-        imageUrl: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=400&auto=format&fit=crop&fm=webp&q=80',
-        expertise: ['Dark Pop', 'Industrial', 'Melodic Arrangement', 'Songwriting'],
-        categories: ['Artist'],
-        bio: 'Widow is the ethereal voice of the underground. With a background in classical training and a passion for industrial electronics, she crafts haunting melodies that linger long after the track ends.'
+        bio: 'PnuTs is the backbone of UNDR:LA, overseeing daily operations, managing the facility, and ensuring the space is always pristine and ready for creativity. He keeps a watchful eye on everything to guarantee a seamless experience for every artist.'
     }
 ];
 

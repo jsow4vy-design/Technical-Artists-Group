@@ -3,29 +3,38 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { LoadingSpinnerIcon } from './components/icons';
 import SEO from './components/SEO';
 
-// Lazy load components to improve initial load time
+// ============================================================================
+// Lazy Loaded Components
+// ============================================================================
+// Lazy loading improves initial load time by splitting code into smaller chunks
 const LandingPage = lazy(() => import('./components/LandingPage'));
 const Chatbot = lazy(() => import('./components/Chatbot'));
 const Footer = lazy(() => import('./components/Footer'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const AdminLoginPage = lazy(() => import('./components/AdminLoginPage'));
-const MoesGallery = lazy(() => import('./components/MoesGallery'));
+const UNDRLAGallery = lazy(() => import('./components/UNDRLAGallery'));
 const TeamPage = lazy(() => import('./components/TeamPage'));
 
-// Simple loading fallback
+// ============================================================================
+// Loader Component
+// ============================================================================
+// Simple loading fallback displayed while lazy-loaded components are fetching
 const Loader: React.FC = () => (
   <div className="flex items-center justify-center h-screen w-screen bg-[#111111]">
       <LoadingSpinnerIcon />
   </div>
 );
 
+// ============================================================================
+// Main Application Component
+// ============================================================================
 const App: React.FC = () => {
-  // Define available views
-  type View = 'landing' | 'moes' | 'adminLogin' | 'admin' | 'team';
+  // --- State Management ---
+  type View = 'landing' | 'gallery' | 'adminLogin' | 'admin' | 'team';
   const [view, setView] = useState<View>('landing');
   const [showFooter, setShowFooter] = useState(false);
 
-  // Navigation handlers
+  // --- Navigation Handlers ---
   const navigateToAdminLogin = () => setView('adminLogin');
   const handleLoginSuccess = () => setView('admin');
   
@@ -38,20 +47,24 @@ const App: React.FC = () => {
   };
 
   const handleBackToGallery = () => {
-    setView('moes');
+    setView('gallery');
   };
 
   const handleViewTeam = () => {
     setView('team');
   };
 
+  // --- Effects ---
+
   // Effect: Footer visibility logic
+  // Determines whether the footer should be shown based on the current view
   useEffect(() => {
-    const isGalleryView = view === 'moes' || view === 'team';
+    const isGalleryView = view === 'gallery' || view === 'team';
     setShowFooter(isGalleryView);
   }, [view]);
 
   // Effect: Keyboard shortcut (Ctrl/Meta + Alt + A) for Admin Login
+  // Provides a quick way for administrators to access the login page
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'a') {
@@ -66,13 +79,14 @@ const App: React.FC = () => {
   }, []);
   
   // Effect: Handle URL hash for routing (Admin + Deep Links)
+  // Allows navigating to specific views using URL hashes
   useEffect(() => {
     const handleHashRouting = () => {
       const hash = window.location.hash;
       if (hash === '#admin') {
          if (view !== 'admin' && view !== 'adminLogin') navigateToAdminLogin();
       } else if (hash === '#studio') {
-         if (view !== 'moes') setView('moes');
+         if (view !== 'gallery') setView('gallery');
       } else if (hash === '#team') {
          if (view !== 'team') setView('team');
       }
@@ -87,6 +101,7 @@ const App: React.FC = () => {
   }, [view]);
 
   // Effect: Smooth scrolling and position reset on view change
+  // Ensures the user starts at the top of the page when navigating to a new view
   useEffect(() => {
     const handleScrollPosition = () => {
       const hash = window.location.hash;
@@ -108,8 +123,11 @@ const App: React.FC = () => {
   }, [view]);
 
 
-  // --- Render Logic ---
+  // ============================================================================
+  // Render Logic
+  // ============================================================================
 
+  // Render the landing page directly if it's the active view
   if (view === 'landing') {
     return (
       <Suspense fallback={<Loader />}>
@@ -119,6 +137,7 @@ const App: React.FC = () => {
     );
   }
 
+  // Render other views based on the current state
   const renderContent = () => {
     switch(view) {
         case 'adminLogin':
@@ -135,8 +154,8 @@ const App: React.FC = () => {
                 <AdminDashboard onBack={handleBackToLanding} />
               </>
             );
-        case 'moes':
-            return <MoesGallery onBack={handleBackToLanding} onViewTeam={handleViewTeam} />;
+        case 'gallery':
+            return <UNDRLAGallery onBack={handleBackToLanding} onViewTeam={handleViewTeam} />;
         case 'team':
             return <TeamPage onBack={handleBackToGallery} />;
         default:

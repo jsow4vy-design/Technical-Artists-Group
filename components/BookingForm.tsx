@@ -3,7 +3,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Input, Textarea } from './FormControls';
 import { studioPackages } from '../data/studioData';
 import { SubmissionSuccess } from './common/SubmissionSuccess';
-import { PolicyModal } from './MoesGallery';
+import { PolicyModal } from './UNDRLAGallery';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useBooking, BookingProvider, StudioPackage } from '../contexts/BookingContext';
 import { sendConfirmation } from '../services/emailService';
@@ -24,7 +24,7 @@ const PackageCard: React.FC<{ pkg: StudioPackage }> = ({ pkg }) => {
         }
     };
 
-    const baseClasses = "cursor-pointer h-full flex flex-col p-6 bg-gray-900/40 border-2 rounded-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black";
+    const baseClasses = "cursor-pointer h-full flex flex-col p-4 bg-gray-900/40 border-2 rounded-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black";
     const borderClasses = isAddon
         ? (isSelected ? 'border-yellow-500 bg-yellow-500/5 animate-pulse-glow-yellow' : 'border-gray-800 hover:border-yellow-500/40')
         : (isSelected ? 'border-fuchsia-500 bg-fuchsia-500/5 animate-pulse-glow' : 'border-gray-800 hover:border-fuchsia-500/40');
@@ -38,24 +38,24 @@ const PackageCard: React.FC<{ pkg: StudioPackage }> = ({ pkg }) => {
             tabIndex={0}
             className={`${baseClasses} ${borderClasses}`}
         >
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-start mb-2">
                 <div>
-                    <h4 className="text-xl font-bold text-white group-hover:text-fuchsia-400 transition-colors">{pkg.title}</h4>
-                    <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">{pkg.category}</span>
+                    <h4 className="text-base font-bold text-white group-hover:text-fuchsia-400 transition-colors">{pkg.title}</h4>
+                    <span className="text-[9px] uppercase tracking-widest text-gray-500 font-bold">{pkg.category}</span>
                 </div>
-                <p className={`text-lg font-bold ${isAddon ? 'text-yellow-400' : 'text-fuchsia-400'}`}>{pkg.priceDisplay}</p>
+                <p className={`text-sm font-bold ${isAddon ? 'text-yellow-400' : 'text-fuchsia-400'}`}>{pkg.priceDisplay}</p>
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed mb-6 flex-grow">{pkg.description}</p>
+            <p className="text-gray-400 text-xs leading-relaxed mb-4 flex-grow">{pkg.description}</p>
             
             <div className="flex items-center gap-2 mt-auto">
-                <div className={`w-4 h-4 rounded-full border-2 transition-colors ${isSelected ? (isAddon ? 'bg-yellow-500 border-yellow-500' : 'bg-fuchsia-500 border-fuchsia-500') : 'border-gray-600'}`}>
+                <div className={`w-3 h-3 rounded-full border-2 transition-colors ${isSelected ? (isAddon ? 'bg-yellow-500 border-yellow-500' : 'bg-fuchsia-500 border-fuchsia-500') : 'border-gray-600'}`}>
                     {isSelected && (
                         <svg className="w-full h-full text-black p-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4">
                             <polyline points="20 6 9 17 4 12" />
                         </svg>
                     )}
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-500">{isSelected ? 'Selected' : 'Select'}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">{isSelected ? 'Selected' : 'Select'}</span>
             </div>
         </div>
     );
@@ -73,16 +73,16 @@ const DynamicPackageGrid: React.FC = () => {
     }, [categories]);
 
     return (
-        <div className="space-y-20">
+        <div className="space-y-12">
             {categories.map(category => (
                 <section key={category} className="animate-fade-in">
-                    <div className="flex items-center gap-4 mb-8">
-                        <h3 className={`text-2xl font-bold uppercase tracking-[0.2em] whitespace-nowrap ${category === 'Engineer Add-ons' ? 'text-yellow-500' : 'text-white'}`}>
+                    <div className="flex items-center gap-4 mb-6">
+                        <h3 className={`text-xl font-bold uppercase tracking-[0.2em] whitespace-nowrap ${category === 'Engineer Add-ons' ? 'text-yellow-500' : 'text-white'}`}>
                             {category}
                         </h3>
                         <div className="h-px w-full bg-gradient-to-r from-gray-800 to-transparent"></div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {grouped[category].map(pkg => (
                             <PackageCard key={pkg.id} pkg={pkg} />
                         ))}
@@ -185,7 +185,7 @@ const BookingFormContent: React.FC = () => {
             ) : (
                 <div className="space-y-16">
                     <div className="text-center max-w-2xl mx-auto">
-                        <h2 className="text-4xl md:text-5xl font-bold uppercase tracking-widest text-white mb-4" style={{ textShadow: `0 0 20px rgba(255,0,255,0.3)`}}>Reserve Your Block</h2>
+                        <h2 className="text-4xl md:text-6xl font-bold uppercase tracking-widest text-white mb-4" style={{ textShadow: `0 0 20px rgba(255,0,255,0.3)`}}>Reserve Your Block</h2>
                         <p className="text-gray-400">Select your preferred production package and any additional engineering support you need for your project.</p>
                     </div>
                     

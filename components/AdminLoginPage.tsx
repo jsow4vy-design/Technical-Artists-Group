@@ -9,7 +9,7 @@ interface AdminLoginPageProps {
   onBack: () => void;
 }
 
-const DEFAULT_LOGO_URL = 'https://i.imgur.com/x02n31a.png';
+const DEFAULT_LOGO_URL = 'https://i.imgur.com/mlJHumZ.png';
 
 const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, onBack }) => {
   const [password, setPassword] = useState('');

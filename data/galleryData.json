@@ -1,0 +1,41 @@
+[
+  { 
+    "id": 1, 
+    "artist": "Weekly DJ Showcase", 
+    "type": "image", 
+    "description": "Our weekly live stream fundraiser, every Monday at 8 PM PT. Support local artists and keep the music alive!",
+    "images": [
+        "https://images.unsplash.com/photo-1571266028243-37160d7f0e53?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80",
+        "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80"
+    ],
+    "rotation": -1.5,
+    "widthClass": "w-full max-w-4xl",
+    "zIndex": "z-30"
+  },
+  { 
+    "id": 2, 
+    "artist": "Under LA: Monday Nite", 
+    "type": "image", 
+    "description": "Join us for a night of music and unity! Experience live performances and incredible energy.",
+    "images": [
+        "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80",
+        "https://images.unsplash.com/photo-1501612780327-45045538702b?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80"
+    ],
+    "rotation": 2.5,
+    "widthClass": "w-full lg:w-[500px]",
+    "zIndex": "z-40"
+  },
+  {
+    "id": 3,
+    "artist": "Studio Sessions Vol. 1",
+    "type": "image", 
+    "description": "A collection of raw moments and creative breakthroughs from our recent recording blocks.",
+    "images": [
+        "https://images.unsplash.com/photo-1598653222000-6b7b7a552625?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80",
+        "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80"
+    ],
+    "rotation": -2.8,
+    "widthClass": "w-full lg:w-[480px]",
+    "zIndex": "z-20"
+  }
+]

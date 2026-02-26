@@ -1,85 +1,187 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { getGalleries, createGallery, deleteGallery, uploadImageToGallery, deleteImageFromGallery, updateGalleryImages } from '../../services/galleryService';
-import type { Gallery, GalleryImage } from '../../types';
-import { UploadIcon, CloseIcon, CheckIcon, LoadingSpinnerIcon, DragHandleIcon, EditIcon } from '../icons';
-import { Input, Select, Textarea } from '../FormControls';
+import { GallerySession } from '../../types';
+import { getGalleries, createGallery, deleteGallery, uploadImageToGallery, deleteImageFromGallery } from '../../services/galleryService';
+import { TrashIcon, UploadIcon, CloseIcon, LoadingSpinnerIcon } from '../icons';
 import { Modal } from '../common/Modal';
 
-interface GalleryManagerProps {
-    addToast: (message: string) => void;
-}
+// ============================================================================
+// Sub-Components
+// ============================================================================
 
-const GalleryCard: React.FC<{ gallery: Gallery; onClick: () => void; onDelete: (e: React.MouseEvent) => void }> = ({ gallery, onClick, onDelete }) => (
-    <div 
-        onClick={onClick}
-        className="group relative bg-gray-800/50 border border-gray-700 rounded-lg p-4 cursor-pointer hover:border-cyan-400 transition-all duration-300"
-    >
-        <div className="flex justify-between items-start mb-2">
-            <div>
-                <h4 className="font-bold text-lg text-white group-hover:text-cyan-400 transition-colors">{gallery.name}</h4>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    gallery.page === 'moes' ? 'bg-fuchsia-900 text-fuchsia-200' :
-                    'bg-gray-700 text-gray-300'
-                }`}>
-                    {gallery.page === 'moes' ? 'UnderLA' : 
-                     gallery.page === 'landing' ? 'Landing Page' : 'Other'}
-                </span>
-            </div>
-            <button 
-                onClick={onDelete} 
-                className="text-gray-500 hover:text-red-500 p-1 rounded-full hover:bg-gray-700 transition-colors z-10"
-                title="Delete Gallery"
-            >
-                <CloseIcon />
-            </button>
-        </div>
-        <p className="text-sm text-gray-400 mb-4 line-clamp-2 min-h-[2.5rem]">{gallery.description || 'No description provided.'}</p>
-        
-        <div className="flex items-center gap-2">
-            <div className="flex -space-x-2 overflow-hidden">
-                {gallery.images.slice(0, 3).map((img) => (
-                    <img key={img.id} src={img.url} alt="Preview" className="inline-block h-8 w-8 rounded-full ring-2 ring-gray-800 object-cover" loading="lazy" />
-                ))}
-            </div>
-            <span className="text-xs text-gray-500 ml-2">{gallery.images.length} images</span>
-        </div>
-    </div>
-);
+const GalleryDetailModal: React.FC<{
+    gallery: GallerySession;
+    onClose: () => void;
+    onUpdate: () => void;
+    addToast: (msg: string) => void;
+}> = ({ gallery, onClose, onUpdate, addToast }) => {
+    const [isUploading, setIsUploading] = useState(false);
+    const [images, setImages] = useState<string[]>(gallery.images);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-const CreateGalleryModal: React.FC<{ isOpen: boolean; onClose: () => void; onCreate: (name: string, page: Gallery['page'], description: string) => void }> = ({ isOpen, onClose, onCreate }) => {
-    const [name, setName] = useState('');
-    const [page, setPage] = useState<Gallery['page']>('moes');
-    const [description, setDescription] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            const url = await uploadImageToGallery(gallery.id, file);
+            setImages(prev => [...prev, url]);
+            addToast('Image uploaded successfully');
+            onUpdate();
+        } catch (error) {
+            console.error(error);
+            addToast('Failed to upload image');
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    const handleDeleteImage = async (imageUrl: string) => {
+        if (!confirm('Delete this image?')) return;
+        try {
+            await deleteImageFromGallery(gallery.id, imageUrl);
+            setImages(prev => prev.filter(img => img !== imageUrl));
+            addToast('Image deleted');
+            onUpdate();
+        } catch (error) {
+            console.error(error);
+            addToast('Failed to delete image');
+        }
+    };
+
+    return (
+        <Modal isOpen={true} onClose={onClose} ariaLabelledBy="gallery-detail-title">
+            <div className="bg-gray-900 rounded-lg w-full max-w-3xl h-[70vh] flex flex-col border border-gray-800">
+                <header className="p-4 border-b border-gray-800 flex justify-between items-center">
+                    <div>
+                        <h3 id="gallery-detail-title" className="text-lg font-bold text-white uppercase tracking-wider">{gallery.artist}</h3>
+                        <p className="text-gray-400 text-[10px] mt-1">{gallery.description}</p>
+                    </div>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-800 rounded-full text-gray-400 hover:text-white">
+                        <CloseIcon className="w-5 h-5" />
+                    </button>
+                </header>
+                
+                <div className="flex-grow overflow-y-auto p-4 custom-scrollbar">
+                    <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                        <div 
+                            onClick={() => fileInputRef.current?.click()}
+                            className="aspect-[4/3] bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-fuchsia-500 hover:bg-gray-800 transition-all group"
+                        >
+                            {isUploading ? (
+                                <LoadingSpinnerIcon />
+                            ) : (
+                                <>
+                                    <UploadIcon className="w-6 h-6 text-gray-500 group-hover:text-fuchsia-500 mb-2" />
+                                    <span className="text-[10px] font-bold text-gray-500 group-hover:text-white uppercase tracking-wider">Add Photo</span>
+                                </>
+                            )}
+                            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={isUploading} />
+                        </div>
+
+                        {images.map((img, idx) => (
+                            <div key={idx} className="group relative aspect-[4/3] bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+                                <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <button 
+                                        onClick={() => handleDeleteImage(img)}
+                                        className="p-1.5 bg-red-600 rounded-full hover:bg-red-500 text-white transition-transform hover:scale-110"
+                                        title="Delete Image"
+                                    >
+                                        <TrashIcon className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </Modal>
+    );
+};
+
+const CreateGalleryModal: React.FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (data: Omit<GallerySession, 'id'>) => Promise<void>;
+}> = ({ isOpen, onClose, onSave }) => {
+    const [formData, setFormData] = useState({
+        artist: '',
+        description: '',
+        rotation: 0,
+        widthClass: 'w-72',
+        zIndex: 'z-10'
+    });
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSubmitting(true);
-        await onCreate(name, page, description);
-        setIsSubmitting(false);
-        onClose();
-        setName('');
-        setDescription('');
-        setPage('moes');
+        setIsSaving(true);
+        try {
+            await onSave({
+                ...formData,
+                type: 'image',
+                images: []
+            });
+            onClose();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} ariaLabelledBy="create-gallery-title">
-            <div className="bg-gray-900 rounded-lg p-6 border border-cyan-500/30 w-full max-w-lg">
-                <h3 id="create-gallery-title" className="text-2xl font-bold text-cyan-400 mb-6">Create New Gallery</h3>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <Input label="Gallery Name" value={name} onChange={e => setName(e.target.value)} required placeholder="e.g. Session Showcase" />
-                    <Select label="Designated Page" value={page} onChange={e => setPage(e.target.value as Gallery['page'])} required>
-                        <option value="moes">UnderLA.Studio</option>
-                        <option value="landing">Landing Page</option>
-                        <option value="other">Other</option>
-                    </Select>
-                    <Textarea label="Description" value={description} onChange={e => setDescription(e.target.value)} placeholder="What is this gallery for?" />
-                    <div className="flex justify-end gap-3 mt-6">
-                        <button type="button" onClick={onClose} className="px-4 py-2 rounded-full text-gray-300 hover:bg-gray-800">Cancel</button>
-                        <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-cyan-500 text-black font-bold rounded-full hover:bg-cyan-400 disabled:opacity-50">
-                            {isSubmitting ? 'Creating...' : 'Create Gallery'}
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 w-full max-w-md">
+                <h3 id="create-gallery-title" className="text-base font-bold text-white mb-4 uppercase tracking-wider text-center">New Gallery Session</h3>
+                <form onSubmit={handleSubmit} className="space-y-3">
+                    <div>
+                        <label className="block text-xs font-medium text-gray-300 mb-1">Artist / Session Name</label>
+                        <input 
+                            type="text"
+                            value={formData.artist} 
+                            onChange={e => setFormData(prev => ({ ...prev, artist: e.target.value }))} 
+                            required 
+                            className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-1.5 text-white text-sm focus:outline-none focus:border-fuchsia-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-300 mb-1">Description</label>
+                        <textarea 
+                            value={formData.description} 
+                            onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))} 
+                            required 
+                            rows={2}
+                            className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-1.5 text-white text-sm focus:outline-none focus:border-fuchsia-500"
+                        />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-xs font-medium text-gray-300 mb-1">Rotation (deg)</label>
+                            <input 
+                                type="number"
+                                value={formData.rotation} 
+                                onChange={e => setFormData(prev => ({ ...prev, rotation: parseInt(e.target.value) }))} 
+                                className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-1.5 text-white text-sm focus:outline-none focus:border-fuchsia-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-300 mb-1">Z-Index Class</label>
+                            <input 
+                                type="text"
+                                value={formData.zIndex} 
+                                onChange={e => setFormData(prev => ({ ...prev, zIndex: e.target.value }))} 
+                                placeholder="z-10"
+                                className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-1.5 text-white text-sm focus:outline-none focus:border-fuchsia-500"
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-2 pt-3">
+                        <button type="button" onClick={onClose} className="px-4 py-1.5 rounded-full text-xs text-gray-400 hover:text-white hover:bg-gray-800">Cancel</button>
+                        <button type="submit" disabled={isSaving} className="px-5 py-1.5 bg-fuchsia-600 text-white text-xs font-bold rounded-full hover:bg-fuchsia-500 disabled:opacity-50">
+                            {isSaving ? <LoadingSpinnerIcon className="w-3 h-3" /> : 'Create Session'}
                         </button>
                     </div>
                 </form>
@@ -88,283 +190,131 @@ const CreateGalleryModal: React.FC<{ isOpen: boolean; onClose: () => void; onCre
     );
 };
 
-const GalleryDetailModal: React.FC<{ 
-    gallery: Gallery; 
-    onClose: () => void; 
-    onUpload: (file: File) => Promise<void>; 
-    onDeleteImage: (imageId: string) => Promise<void>;
-    onReorderImages: (newImages: GalleryImage[]) => Promise<void>;
-}> = ({ gallery, onClose, onUpload, onDeleteImage, onReorderImages }) => {
-    const [isUploading, setIsUploading] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+// ============================================================================
+// Main Component
+// ============================================================================
 
-    // Drag and Drop State
-    const dragItem = useRef<number | null>(null);
-    const dragOverItem = useRef<number | null>(null);
-    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-    const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        
-        setIsUploading(true);
-        try {
-            await onUpload(file);
-        } finally {
-            setIsUploading(false);
-            if (fileInputRef.current) fileInputRef.current.value = '';
-        }
-    };
-
-    // Drag Handlers
-    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-        dragItem.current = index;
-        setDraggingIndex(index);
-        e.dataTransfer.effectAllowed = 'move';
-    };
-
-    const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-        e.preventDefault();
-        dragOverItem.current = index;
-        setDragOverIndex(index);
-    };
-
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    };
-
-    const handleDragEnd = async () => {
-        const startIndex = dragItem.current;
-        const endIndex = dragOverItem.current;
-
-        if (startIndex !== null && endIndex !== null && startIndex !== endIndex) {
-            const newImages = [...gallery.images];
-            const draggedItemContent = newImages.splice(startIndex, 1)[0];
-            newImages.splice(endIndex, 0, draggedItemContent);
-            
-            // Optimistic update handled by parent prop, but async save happens here
-            await onReorderImages(newImages);
-        }
-
-        // Reset state
-        dragItem.current = null;
-        dragOverItem.current = null;
-        setDragOverIndex(null);
-        setDraggingIndex(null);
-    };
-
-    return (
-        <Modal isOpen={true} onClose={onClose} ariaLabelledBy="gallery-detail-title">
-            <div className="bg-gray-900 rounded-lg border border-cyan-500/30 w-full max-w-5xl h-[85vh] flex flex-col">
-                <div className="p-6 border-b border-gray-800 flex justify-between items-center">
-                    <div>
-                        <h3 id="gallery-detail-title" className="text-2xl font-bold text-white">{gallery.name}</h3>
-                        <p className="text-cyan-400 text-sm">{gallery.page === 'moes' ? 'UnderLA' : gallery.page}</p>
-                    </div>
-                    <div className="flex gap-4 items-center">
-                        <input 
-                            ref={fileInputRef}
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={handleFileChange}
-                            id="gallery-upload"
-                        />
-                        <label 
-                            htmlFor="gallery-upload"
-                            className={`flex items-center gap-2 px-4 py-2 bg-cyan-500 text-black font-bold rounded-full cursor-pointer hover:bg-cyan-400 transition-colors ${isUploading ? 'opacity-50 cursor-wait' : ''}`}
-                        >
-                            {isUploading ? <LoadingSpinnerIcon /> : <UploadIcon className="w-5 h-5" />}
-                            <span>{isUploading ? 'Uploading...' : 'Upload Image'}</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div className="flex-grow overflow-y-auto p-6">
-                    {gallery.images.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-gray-500">
-                            <UploadIcon className="w-12 h-12 mb-4 opacity-50" />
-                            <p>No images in this gallery yet.</p>
-                            <p className="text-sm">Upload some images to get started.</p>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                            {gallery.images.map((img, index) => (
-                                <div 
-                                    key={img.id} 
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, index)}
-                                    onDragEnter={(e) => handleDragEnter(e, index)}
-                                    onDragOver={handleDragOver}
-                                    onDragEnd={handleDragEnd}
-                                    className={`group relative aspect-square bg-gray-800 rounded-md overflow-hidden border border-gray-700 cursor-move transition-all duration-300
-                                        ${dragOverIndex === index ? 'scale-105 border-cyan-400 ring-2 ring-cyan-400 z-10' : ''}
-                                        ${draggingIndex === index ? 'opacity-40' : 'opacity-100'}
-                                    `}
-                                >
-                                    <img src={img.url} alt={img.title} className="w-full h-full object-cover pointer-events-none" loading="lazy" />
-                                    <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center ${draggingIndex !== null ? 'opacity-0 group-hover:opacity-0' : ''}`}>
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); onDeleteImage(img.id); }}
-                                            className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500 transition-colors"
-                                            title="Delete Image"
-                                        >
-                                            <CloseIcon />
-                                        </button>
-                                    </div>
-                                    <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded p-1">
-                                         <DragHandleIcon className="w-4 h-4 text-white" />
-                                    </div>
-                                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/90 to-transparent">
-                                        <p className="text-xs text-white truncate">{img.title}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </Modal>
-    );
-};
-
-export const GalleryManager: React.FC<GalleryManagerProps> = ({ addToast }) => {
-    const [galleries, setGalleries] = useState<Gallery[]>([]);
+export const GalleryManager: React.FC<{ addToast: (msg: string) => void }> = ({ addToast }) => {
+    const [galleries, setGalleries] = useState<GallerySession[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [selectedGallery, setSelectedGallery] = useState<Gallery | null>(null);
+    const [selectedGallery, setSelectedGallery] = useState<GallerySession | null>(null);
+
+    const loadGalleries = async () => {
+        try {
+            const data = await getGalleries();
+            setGalleries(data);
+        } catch (error) {
+            addToast('Failed to load galleries');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         loadGalleries();
     }, []);
 
-    const loadGalleries = async () => {
-        setIsLoading(true);
-        const data = await getGalleries();
-        setGalleries(data);
-        setIsLoading(false);
-    };
-
-    const handleCreateGallery = async (name: string, page: Gallery['page'], description: string) => {
+    const handleCreate = async (data: Omit<GallerySession, 'id'>) => {
         try {
-            const newGallery = await createGallery(name, page, description);
-            setGalleries(prev => [...prev, newGallery]);
-            addToast(`Gallery "${name}" created successfully.`);
-        } catch (e) {
-            addToast('Failed to create gallery.');
-        }
-    };
-
-    const handleDeleteGallery = async (e: React.MouseEvent, id: string) => {
-        e.stopPropagation();
-        if (window.confirm('Are you sure you want to delete this gallery? This action cannot be undone.')) {
-            try {
-                await deleteGallery(id);
-                setGalleries(prev => prev.filter(g => g.id !== id));
-                addToast('Gallery deleted.');
-            } catch (e) {
-                addToast('Failed to delete gallery.');
-            }
-        }
-    };
-
-    const handleUploadImage = async (file: File) => {
-        if (!selectedGallery) return;
-        try {
-            const newImage = await uploadImageToGallery(selectedGallery.id, file);
-            // Update local state to reflect change immediately
-            const updatedGallery = { ...selectedGallery, images: [...selectedGallery.images, newImage] };
-            setSelectedGallery(updatedGallery);
-            setGalleries(prev => prev.map(g => g.id === updatedGallery.id ? updatedGallery : g));
-            addToast('Image uploaded successfully.');
-        } catch (e) {
-            addToast('Failed to upload image.');
-        }
-    };
-
-    const handleDeleteImage = async (imageId: string) => {
-        if (!selectedGallery) return;
-        if (!window.confirm('Delete this image?')) return;
-        
-        try {
-            await deleteImageFromGallery(selectedGallery.id, imageId);
-            const updatedGallery = { ...selectedGallery, images: selectedGallery.images.filter(img => img.id !== imageId) };
-            setSelectedGallery(updatedGallery);
-            setGalleries(prev => prev.map(g => g.id === updatedGallery.id ? updatedGallery : g));
-            addToast('Image deleted.');
-        } catch (e) {
-            addToast('Failed to delete image.');
-        }
-    };
-
-    const handleReorderImages = async (newImages: GalleryImage[]) => {
-        if (!selectedGallery) return;
-        
-        // Optimistic UI Update
-        const updatedGallery = { ...selectedGallery, images: newImages };
-        setSelectedGallery(updatedGallery);
-        setGalleries(prev => prev.map(g => g.id === updatedGallery.id ? updatedGallery : g));
-
-        try {
-            await updateGalleryImages(selectedGallery.id, newImages);
-            addToast('Image order saved.');
-        } catch (e) {
-            addToast('Failed to save image order.');
-            // Revert on error (could be implemented more robustly with previous state backup)
+            await createGallery(data);
+            addToast('Gallery session created');
+            setIsCreateModalOpen(false);
             loadGalleries();
+        } catch (error) {
+            addToast('Failed to create gallery');
         }
     };
 
-    if (isLoading) return <div className="flex justify-center p-12"><LoadingSpinnerIcon /></div>;
+    const handleDelete = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this gallery session?')) return;
+        try {
+            await deleteGallery(id);
+            setGalleries(prev => prev.filter(g => g.id !== id));
+            addToast('Gallery session deleted');
+        } catch (error) {
+            addToast('Failed to delete gallery');
+        }
+    };
 
     return (
         <section>
-             <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h2 className="text-3xl font-bold uppercase tracking-widest text-white">Gallery Management</h2>
-                    <p className="text-gray-400 mt-1">Organize and manage image collections per page.</p>
+            <header className="flex flex-col items-center justify-center text-center mb-6">
+                <h2 className="text-lg font-bold uppercase tracking-widest text-white">Gallery Sessions</h2>
+                <p className="text-gray-400 mt-0.5 text-[10px]">Manage the visual journal entries displayed on the main gallery page.</p>
+                
+                <div className="mt-4">
+                    <button 
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-1.5 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-full font-bold uppercase tracking-wider transition-all shadow-lg shadow-fuchsia-500/20 text-[10px]"
+                    >
+                        <UploadIcon className="w-3 h-3" />
+                        <span>New Session</span>
+                    </button>
                 </div>
-                <button 
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-bold rounded-full hover:scale-105 transition-transform flex items-center gap-2"
-                >
-                    <span>+ Create Gallery</span>
-                </button>
-            </div>
+            </header>
 
-            {galleries.length === 0 ? (
-                <div className="text-center py-12 bg-gray-800/30 rounded-lg border border-gray-700 border-dashed">
-                    <p className="text-gray-400 mb-4">No galleries found.</p>
-                    <button onClick={() => setIsCreateModalOpen(true)} className="text-cyan-400 hover:underline">Create your first gallery</button>
+            {isLoading ? (
+                <div className="flex justify-center py-20">
+                    <LoadingSpinnerIcon className="w-10 h-10 text-fuchsia-500" />
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {galleries.map(gallery => (
-                        <GalleryCard 
-                            key={gallery.id} 
-                            gallery={gallery} 
-                            onClick={() => setSelectedGallery(gallery)}
-                            onDelete={(e) => handleDeleteGallery(e, gallery.id)}
-                        />
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {galleries.map((gallery) => (
+                        <div key={gallery.id} className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800 hover:border-fuchsia-500/50 transition-all group">
+                            <div className="aspect-video bg-gray-800 relative overflow-hidden">
+                                {gallery.images.length > 0 ? (
+                                    <img src={gallery.images[0]} alt={gallery.artist} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-gray-600 bg-gray-800/50">
+                                        <span className="text-[9px] uppercase tracking-widest font-bold">No Images</span>
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                    <button 
+                                        onClick={() => setSelectedGallery(gallery)}
+                                        className="px-3 py-1 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform text-[9px] uppercase tracking-wider"
+                                    >
+                                        Manage Images
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="p-3">
+                                <div className="flex justify-between items-start mb-1">
+                                    <h3 className="text-xs font-bold text-white uppercase tracking-tight">{gallery.artist}</h3>
+                                    <button 
+                                        onClick={() => handleDelete(gallery.id)}
+                                        className="text-gray-500 hover:text-red-500 transition-colors p-0.5"
+                                        title="Delete Session"
+                                    >
+                                        <TrashIcon className="w-3 h-3" />
+                                    </button>
+                                </div>
+                                <p className="text-[10px] text-gray-400 line-clamp-2 mb-2 h-7">{gallery.description}</p>
+                                <div className="flex items-center gap-3 text-[8px] font-mono text-gray-500 uppercase tracking-wider border-t border-gray-800 pt-1.5">
+                                    <span>{gallery.images.length} Images</span>
+                                    <span>Rotation: {gallery.rotation}°</span>
+                                </div>
+                            </div>
+                        </div>
                     ))}
                 </div>
             )}
 
-            <CreateGalleryModal 
-                isOpen={isCreateModalOpen} 
-                onClose={() => setIsCreateModalOpen(false)} 
-                onCreate={handleCreateGallery} 
-            />
+            {isCreateModalOpen && (
+                <CreateGalleryModal 
+                    isOpen={isCreateModalOpen} 
+                    onClose={() => setIsCreateModalOpen(false)} 
+                    onSave={handleCreate} 
+                />
+            )}
 
             {selectedGallery && (
                 <GalleryDetailModal 
-                    gallery={selectedGallery}
-                    onClose={() => setSelectedGallery(null)}
-                    onUpload={handleUploadImage}
-                    onDeleteImage={handleDeleteImage}
-                    onReorderImages={handleReorderImages}
+                    gallery={selectedGallery} 
+                    onClose={() => setSelectedGallery(null)} 
+                    onUpdate={loadGalleries}
+                    addToast={addToast}
                 />
             )}
         </section>

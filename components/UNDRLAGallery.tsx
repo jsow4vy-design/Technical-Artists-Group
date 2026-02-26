@@ -1,74 +1,27 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { CloseIcon, PlayIcon, PauseIcon, UsersIcon, SkipBackIcon, SkipForwardIcon, ChevronDownIcon } from './icons';
-import { studioFaqs, featuredSessions as defaultFeaturedSessions } from '../data/studioData';
+import { studioFaqs, featuredSessions as defaultFeaturedSessions, studioTeam } from '../data/studioData';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Modal } from './common/Modal';
 import { GalleryLayout } from '../layouts/GalleryLayout';
 import { BookingForm } from './BookingForm';
 import { blueprintStyleFuchsia } from '../styles/common';
-import type { FeaturedSession } from '../types';
+import type { FeaturedSession, GallerySession } from '../types';
 import SEO from './SEO';
 
-// --- TYPES & DATA ---
+// ============================================================================
+// Types & Interfaces
+// ============================================================================
 
-interface Session {
-  id: number;
-  artist: string;
-  type: 'image' | 'video';
-  description: string;
-  images: string[];
-  rotation: number;
-  widthClass: string;
-  zIndex: string;
-}
+// (Types are imported from ../types)
 
-const moesSessions: Session[] = [
-  { 
-    id: 1, 
-    artist: 'Weekly DJ Showcase', 
-    type: 'image', 
-    description: 'Our weekly live stream fundraiser, every Monday at 8 PM PT. Support local artists and keep the music alive!',
-    images: [
-        'https://images.unsplash.com/photo-1571266028243-37160d7f0e53?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80',
-        'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80'
-    ],
-    rotation: -1.5,
-    widthClass: 'w-full max-w-4xl',
-    zIndex: 'z-30'
-  },
-  { 
-    id: 2, 
-    artist: 'Under LA: Monday Nite', 
-    type: 'image', 
-    description: 'Join us for a night of music and unity! Experience live performances and incredible energy.',
-    images: [
-        'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80',
-        'https://images.unsplash.com/photo-1501612780327-45045538702b?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80'
-    ],
-    rotation: 2.5,
-    widthClass: 'w-full lg:w-[500px]',
-    zIndex: 'z-40'
-  },
-  {
-    id: 3,
-    artist: 'Studio Sessions Vol. 1',
-    type: 'image',
-    description: 'A collection of raw moments and creative breakthroughs from our recent recording blocks.',
-    images: [
-        'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80',
-        'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=1000&auto=format&fit=crop&fm=webp&q=80'
-    ],
-    rotation: -2.8,
-    widthClass: 'w-full lg:w-[480px]',
-    zIndex: 'z-20'
-  }
-];
-
-// --- SUB-COMPONENTS ---
+// ============================================================================
+// Sub-Components
+// ============================================================================
 
 /**
- * Added missing export PolicyModal component used by BookingForm.
+ * Modal displaying studio policies.
  */
 export const PolicyModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
     <Modal isOpen={true} onClose={onClose} ariaLabelledBy="policy-modal-title">
@@ -120,6 +73,9 @@ export const PolicyModal: React.FC<{ onClose: () => void }> = ({ onClose }) => (
     </Modal>
 );
 
+/**
+ * Decorative tape overlay for the collage items.
+ */
 const TapeOverlay: React.FC<{ position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top' }> = ({ position }) => {
     const posClasses = {
         'top-left': "-top-4 -left-6 rotate-[-45deg]",
@@ -140,7 +96,10 @@ const TapeOverlay: React.FC<{ position: 'top-left' | 'top-right' | 'bottom-left'
     );
 };
 
-const CollageItem: React.FC<{ session: Session; index: number; className?: string; isPolaroid?: boolean }> = ({ session, index, className = "", isPolaroid = true }) => {
+/**
+ * Individual collage item displaying a session with rotating images.
+ */
+const CollageItem: React.FC<{ session: GallerySession; index: number; className?: string; isPolaroid?: boolean }> = ({ session, index, className = "", isPolaroid = true }) => {
     const [currentImageIdx, setCurrentImageIdx] = useState(0);
 
     useEffect(() => {
@@ -152,7 +111,7 @@ const CollageItem: React.FC<{ session: Session; index: number; className?: strin
 
     return (
         <article 
-            className={`transition-all duration-1000 ${session.widthClass} ${session.zIndex} ${className}`}
+            className={`transition-all duration-1000 ${className}`}
             style={{ 
                 transform: `rotate(${session.rotation}deg)`,
                 perspective: '1500px'
@@ -192,6 +151,9 @@ const CollageItem: React.FC<{ session: Session; index: number; className?: strin
     );
 };
 
+/**
+ * FAQ Accordion Item.
+ */
 const FaqItem: React.FC<{ faq: { id: number; question: string; answer: string }; index: number }> = ({ faq, index }) => {
     const [isOpen, setIsOpen] = useState(false);
     return (
@@ -213,6 +175,9 @@ const FaqItem: React.FC<{ faq: { id: number; question: string; answer: string };
     );
 };
 
+/**
+ * Individual track item in the showcase player playlist.
+ */
 const ShowcaseItem: React.FC<{ 
     track: FeaturedSession; 
     index: number; 
@@ -256,51 +221,150 @@ const ShowcaseItem: React.FC<{
     </button>
 );
 
+/**
+ * Audio player component for the studio showcase.
+ */
 const StudioShowcasePlayer: React.FC<{ playlist: FeaturedSession[] }> = ({ playlist }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
     const currentTrack = playlist[currentIndex];
     const audioRef = useRef<HTMLAudioElement>(null);
 
+    // Auto-play effect when track changes IF already playing
+    useEffect(() => {
+        if (isPlaying && audioRef.current) {
+            audioRef.current.play().catch(() => {});
+        }
+    }, [currentIndex]);
+
     const togglePlay = () => {
         if (!audioRef.current) return;
-        if (isPlaying) audioRef.current.pause();
-        else audioRef.current.play();
-        setIsPlaying(!isPlaying);
+        if (isPlaying) {
+            audioRef.current.pause();
+            setIsPlaying(false);
+        } else {
+            audioRef.current.play();
+            setIsPlaying(true);
+        }
     };
+
+    const handleNext = () => {
+        setCurrentIndex((prev) => (prev + 1) % playlist.length);
+    };
+
+    const handlePrev = () => {
+        setCurrentIndex((prev) => (prev - 1 + playlist.length) % playlist.length);
+    };
+
+    const handleTimeUpdate = () => {
+        if (audioRef.current) {
+            setCurrentTime(audioRef.current.currentTime);
+            setDuration(audioRef.current.duration || 0);
+        }
+    };
+
+    const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const time = parseFloat(e.target.value);
+        if (audioRef.current) {
+            audioRef.current.currentTime = time;
+            setCurrentTime(time);
+        }
+    };
+
+    const formatTime = (time: number) => {
+        if (isNaN(time)) return "0:00";
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
+
+    const progressPercent = duration ? (currentTime / duration) * 100 : 0;
 
     return (
         <div className="bg-[#0a0a0a] rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col lg:flex-row max-w-7xl mx-auto shadow-2xl">
             <div className="flex-grow p-12 flex flex-col items-center justify-center bg-gradient-to-br from-black to-[#111] relative">
+                {/* Header/Badge */}
                 <div className="absolute top-8 left-8 flex items-center gap-2">
                     <div className="w-2 h-2 bg-fuchsia-500 rounded-full animate-pulse shadow-[0_0_8px_#ff00ff]"></div>
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Live Roster Showcase</span>
                 </div>
-                <div className="relative w-full max-w-sm aspect-square mb-12">
-                    <div className="absolute -inset-4 bg-fuchsia-500/10 rounded-full blur-[60px] animate-pulse"></div>
-                    <img src={currentTrack.imageUrl} alt="" className="relative w-full h-full object-cover rounded-3xl border border-white/10 shadow-2xl" loading="lazy" />
+                
+                {/* Album Art */}
+                <div className="relative w-full max-w-sm aspect-square mb-12 group">
+                    <div className="absolute -inset-4 bg-fuchsia-500/10 rounded-full blur-[60px] animate-pulse group-hover:bg-fuchsia-500/20 transition-colors"></div>
+                    <img src={currentTrack.imageUrl} alt="" className="relative w-full h-full object-cover rounded-3xl border border-white/10 shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]" loading="lazy" />
                 </div>
-                <div className="text-center mb-10">
-                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter mb-1">{currentTrack.title}</h3>
+                
+                {/* Track Info */}
+                <div className="text-center mb-8 w-full max-w-lg">
+                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter mb-2 line-clamp-1">{currentTrack.title}</h3>
                     <p className="text-fuchsia-500 text-sm font-bold uppercase tracking-widest">{currentTrack.artist}</p>
                 </div>
-                <div className="flex items-center gap-8">
-                    <button onClick={() => setCurrentIndex((currentIndex - 1 + playlist.length) % playlist.length)} className="text-gray-600 hover:text-white transition-colors"><SkipBackIcon className="w-8 h-8" /></button>
-                    <button onClick={togglePlay} className="w-20 h-20 bg-fuchsia-600 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform shadow-xl shadow-fuchsia-500/20">
+
+                {/* Progress Bar (Only for Audio) */}
+                {currentTrack.mediaType === 'audio' && (
+                    <div className="w-full max-w-md mb-8 flex items-center gap-4">
+                        <span className="text-[10px] text-gray-500 font-mono font-bold w-8 text-right">{formatTime(currentTime)}</span>
+                        <div className="flex-grow relative h-1.5 bg-gray-800 rounded-full group cursor-pointer">
+                             <input 
+                                type="range" 
+                                min="0" 
+                                max={duration || 100} 
+                                value={currentTime} 
+                                onChange={handleSeek}
+                                className="absolute inset-0 w-full h-full opacity-0 z-20 cursor-pointer"
+                             />
+                             <div className="absolute top-0 left-0 h-full bg-fuchsia-600 rounded-full pointer-events-none transition-all duration-100 ease-linear z-10" style={{ width: `${progressPercent}%` }}></div>
+                             <div className="absolute top-1/2 -translate-y-1/2 h-3 w-3 bg-white rounded-full shadow-lg pointer-events-none transition-opacity duration-200 opacity-0 group-hover:opacity-100 z-10" style={{ left: `${progressPercent}%` }}></div>
+                        </div>
+                        <span className="text-[10px] text-gray-500 font-mono font-bold w-8">{formatTime(duration)}</span>
+                    </div>
+                )}
+                
+                {/* Controls */}
+                <div className="flex items-center gap-10">
+                    <button onClick={handlePrev} className="text-gray-500 hover:text-white transition-colors hover:scale-110 active:scale-95"><SkipBackIcon className="w-8 h-8" /></button>
+                    <button 
+                        onClick={togglePlay} 
+                        className="w-20 h-20 bg-fuchsia-600 rounded-full flex items-center justify-center text-white hover:bg-fuchsia-500 hover:scale-110 active:scale-95 transition-all shadow-[0_0_30px_rgba(217,70,239,0.3)]"
+                    >
                         {isPlaying ? <PauseIcon className="w-8 h-8" /> : <PlayIcon className="w-8 h-8 ml-1" />}
                     </button>
-                    <button onClick={() => setCurrentIndex((currentIndex + 1) % playlist.length)} className="text-gray-600 hover:text-white transition-colors"><SkipForwardIcon className="w-8 h-8" /></button>
+                    <button onClick={handleNext} className="text-gray-500 hover:text-white transition-colors hover:scale-110 active:scale-95"><SkipForwardIcon className="w-8 h-8" /></button>
                 </div>
-                {currentTrack.mediaType === 'audio' && <audio ref={audioRef} src={currentTrack.mediaUrl} onEnded={() => setIsPlaying(false)} />}
+
+                {currentTrack.mediaType === 'audio' && (
+                    <audio 
+                        ref={audioRef} 
+                        src={currentTrack.mediaUrl} 
+                        onTimeUpdate={handleTimeUpdate}
+                        onLoadedMetadata={handleTimeUpdate}
+                        onEnded={handleNext} 
+                    />
+                )}
             </div>
-            <div className="lg:w-96 bg-black/40 backdrop-blur-3xl border-l border-white/5 p-8 flex flex-col">
-                <header className="flex justify-between items-center mb-8">
+            
+            {/* Playlist Sidebar */}
+            <div className="lg:w-96 bg-black/40 backdrop-blur-3xl border-l border-white/5 p-8 flex flex-col h-[500px] lg:h-auto">
+                <header className="flex justify-between items-center mb-8 flex-shrink-0">
                   <h4 className="text-xs font-black text-gray-500 uppercase tracking-[0.4em]">Studio Queue</h4>
                   <div className="h-px flex-grow ml-4 bg-white/10"></div>
                 </header>
-                <div className="space-y-1 overflow-y-auto flex-grow pr-2">
+                <div className="space-y-1 overflow-y-auto flex-grow pr-2 custom-scrollbar">
                     {playlist.map((track, idx) => (
-                        <ShowcaseItem key={track.id} track={track} index={idx} isActive={currentIndex === idx} isPlaying={isPlaying} onSelect={setCurrentIndex} />
+                        <ShowcaseItem 
+                            key={track.id} 
+                            track={track} 
+                            index={idx} 
+                            isActive={currentIndex === idx} 
+                            isPlaying={isPlaying && currentIndex === idx} 
+                            onSelect={(i) => {
+                                setCurrentIndex(i);
+                                setIsPlaying(true);
+                            }} 
+                        />
                     ))}
                 </div>
             </div>
@@ -308,10 +372,35 @@ const StudioShowcasePlayer: React.FC<{ playlist: FeaturedSession[] }> = ({ playl
     );
 };
 
-const MoesGallery: React.FC<{ onBack: () => void; onViewTeam: () => void }> = ({ onBack, onViewTeam }) => {
+// ... (imports remain the same)
+
+// ... (sub-components remain the same)
+
+// ============================================================================
+// Main Component
+// ============================================================================
+
+/**
+ * Main Gallery Page Component.
+ * Displays the visual journal, resident personnel, and studio showcase.
+ */
+const UNDRLAGallery: React.FC<{ onBack: () => void; onViewTeam: () => void }> = ({ onBack, onViewTeam }) => {
   const [featuredSessions] = useLocalStorage<FeaturedSession[]>('underla_featured_sessions', defaultFeaturedSessions);
   const [studioName] = useLocalStorage<string>('tag_studio_name', 'UNDR:LA Studios');
+  const [gallerySessions, setGallerySessions] = useState<GallerySession[]>([]);
   const bookingFormRef = useRef<HTMLDivElement>(null);
+
+  // Fetch gallery data from the backend
+  useEffect(() => {
+    fetch('/api/gallery')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+            setGallerySessions(data);
+        }
+      })
+      .catch(err => console.error("Failed to fetch gallery data:", err));
+  }, []);
 
   return (
     <GalleryLayout
@@ -327,44 +416,59 @@ const MoesGallery: React.FC<{ onBack: () => void; onViewTeam: () => void }> = ({
             <div className="flex flex-col lg:flex-row justify-between items-start mb-32 gap-12 relative z-[70]">
                 <header className="max-w-xl">
                     <p className="text-fuchsia-500 text-xs font-black uppercase tracking-[0.8em] mb-4">Underground Archives</p>
-                    <h2 className="text-5xl md:text-7xl font-bold text-white uppercase tracking-tighter mb-6 whitespace-nowrap">
+                    <h2 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tighter mb-6 whitespace-nowrap">
                         The Visual Journal
                     </h2>
                     <p className="text-gray-500 text-lg leading-relaxed font-medium">A tactile exploration of our sonic journey. Each snapshot is carefully layered to tell our story of creative breakthrough.</p>
                 </header>
             </div>
             
-            <div className="relative w-full max-w-6xl mx-auto flex flex-col items-center">
+            <div className="relative w-full max-w-7xl mx-auto flex justify-center items-center overflow-x-auto pb-12 custom-scrollbar">
                 <div className="absolute inset-0 opacity-5 pointer-events-none" style={blueprintStyleFuchsia}></div>
                 
-                {/* Large Top Cover Album (Base) */}
-                <div className="w-full flex justify-center z-10 lg:-mb-16">
-                    <CollageItem session={moesSessions[0]} index={0} />
-                </div>
-
-                {/* Overlapping Pair (Layered on top of base) */}
-                <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-0 mt-8 lg:mt-0 px-4">
-                    {/* Monday Nite (Left) */}
-                    <div className="lg:-mr-20 z-40 transform translate-x-4">
-                        <CollageItem session={moesSessions[1]} index={1} />
-                    </div>
-                    {/* Vol 1 (Right) */}
-                    <div className="lg:-ml-20 z-20 mt-12 lg:mt-24 transform -translate-x-4">
-                        <CollageItem session={moesSessions[2]} index={2} />
-                    </div>
+                <div className="flex flex-nowrap items-center justify-center px-12 min-w-full">
+                    {gallerySessions.map((session, index) => (
+                        <div 
+                            key={session.id} 
+                            className={`relative transition-all duration-500 hover:z-[100] hover:scale-105 ${index !== 0 ? '-ml-16 lg:-ml-24' : ''}`}
+                            style={{ zIndex: 50 - index }}
+                        >
+                            <CollageItem 
+                                session={session} 
+                                index={index} 
+                                className="w-[300px] md:w-[360px]"
+                            />
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>
 
-        <section className="py-40 bg-[#050505] border-y border-white/5 cursor-pointer group" onClick={onViewTeam}>
+        <section className="py-40 bg-[#050505] border-y border-white/5">
             <div className="max-w-7xl mx-auto px-6 flex flex-col items-center text-center">
-                <div className="mb-12 relative">
+                <div className="mb-12 relative cursor-pointer group" onClick={onViewTeam}>
                     <div className="absolute inset-0 bg-fuchsia-500/20 blur-3xl animate-pulse"></div>
                     <UsersIcon className="w-16 h-16 text-white relative z-10 group-hover:scale-110 transition-transform" />
                 </div>
-                <h2 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tighter mb-6 group-hover:text-fuchsia-400 transition-colors">Resident Personnel</h2>
-                <p className="text-gray-500 text-xl max-w-2xl mb-12">Collaborate with the world-class engineers and visionary artists that define our sonic fingerprint.</p>
-                <span className="text-xs font-black uppercase tracking-[0.4em] text-fuchsia-500 border-b-2 border-fuchsia-500 pb-2 group-hover:tracking-[0.6em] transition-all">View Full Roster</span>
+                <h2 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tighter mb-6 cursor-pointer hover:text-fuchsia-400 transition-colors" onClick={onViewTeam}>Resident Personnel</h2>
+                <p className="text-gray-500 text-xl max-w-2xl mb-16">Collaborate with the world-class engineers and visionary artists that define our sonic fingerprint.</p>
+                
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full mb-16">
+                    {studioTeam.slice(0, 5).map((member) => (
+                        <div key={member.id} className="group relative bg-[#0a0a0a] rounded-2xl overflow-hidden border border-white/5 hover:border-fuchsia-500/40 transition-all duration-500 cursor-pointer" onClick={onViewTeam}>
+                            <div className="aspect-square relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent z-10 opacity-90 group-hover:opacity-40 transition-opacity duration-500"></div>
+                                <img src={member.imageUrl} alt={member.name} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" loading="lazy" />
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 p-4 z-20 text-left transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                                <h4 className="text-white font-bold text-sm uppercase tracking-tight truncate">{member.name}</h4>
+                                <p className="text-fuchsia-500 text-[9px] font-black uppercase tracking-widest truncate mt-1">{member.role.split('&')[0]}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <button onClick={onViewTeam} className="text-xs font-black uppercase tracking-[0.4em] text-fuchsia-500 border-b-2 border-fuchsia-500 pb-2 hover:tracking-[0.6em] transition-all">View Full Roster</button>
             </div>
         </section>
 
@@ -375,7 +479,7 @@ const MoesGallery: React.FC<{ onBack: () => void; onViewTeam: () => void }> = ({
         <section className="py-24 bg-[#0a0a0a]">
             <div className="max-w-3xl mx-auto px-6">
                 <p className="text-center text-fuchsia-500 text-[10px] font-black uppercase tracking-[0.6em] mb-4">Support Engine</p>
-                <h2 className="text-3xl font-bold text-center text-white uppercase tracking-widest mb-16">Intelligence Base</h2>
+                <h2 className="text-4xl md:text-6xl font-bold text-center text-white uppercase tracking-widest mb-16">Intelligence Base</h2>
                 <div className="space-y-4">
                     {studioFaqs.map((faq, idx) => (
                         <FaqItem key={faq.id} faq={faq} index={idx} />
@@ -398,4 +502,4 @@ const MoesGallery: React.FC<{ onBack: () => void; onViewTeam: () => void }> = ({
   );
 };
 
-export default MoesGallery;
+export default UNDRLAGallery;

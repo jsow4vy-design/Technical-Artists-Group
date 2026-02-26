@@ -11,13 +11,16 @@ interface TeamManagerProps {
 
 const MAX_SIZE_MB = 5;
 
-const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = error => reject(error);
+const uploadFile = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
     });
+    if (!response.ok) throw new Error('Upload failed');
+    const data = await response.json();
+    return data.url;
 };
 
 const MemberFormModal: React.FC<{
@@ -36,6 +39,7 @@ const MemberFormModal: React.FC<{
     });
     const [expertiseInput, setExpertiseInput] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -73,11 +77,15 @@ const MemberFormModal: React.FC<{
             alert(`File too large. Max ${MAX_SIZE_MB}MB.`);
             return;
         }
+        
+        setIsUploading(true);
         try {
-            const base64 = await fileToBase64(file);
-            setFormData(prev => ({ ...prev, imageUrl: base64 }));
+            const url = await uploadFile(file);
+            setFormData(prev => ({ ...prev, imageUrl: url }));
         } catch (e) {
-            alert("Failed to read file.");
+            alert("Failed to upload file.");
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -92,43 +100,46 @@ const MemberFormModal: React.FC<{
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} ariaLabelledBy="member-modal-title">
-            <div className="bg-gray-900 rounded-lg p-8 border border-cyan-500/30 w-full max-w-2xl">
-                <h3 id="member-modal-title" className="text-2xl font-bold text-cyan-400 mb-6">{member ? 'Edit Member' : 'Add New Member'}</h3>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="flex gap-6 flex-col sm:flex-row">
-                        <div className="flex-shrink-0">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Profile Picture</label>
+            <div className="bg-gray-900 rounded-lg p-6 border border-cyan-500/30 w-full max-w-xl">
+                <h3 id="member-modal-title" className="text-lg font-bold text-cyan-400 mb-4 text-center uppercase tracking-wider">{member ? 'Edit Member' : 'Add New Member'}</h3>
+                <form onSubmit={handleSubmit} className="space-y-3">
+                    <div className="flex gap-4 flex-col sm:flex-row">
+                        <div className="flex-shrink-0 flex justify-center sm:justify-start">
                             <div 
-                                className="w-32 h-32 bg-gray-800 rounded-lg border border-gray-700 flex items-center justify-center overflow-hidden cursor-pointer hover:border-cyan-500 transition-colors relative group"
+                                className={`w-24 h-24 bg-gray-800 rounded-lg border border-gray-700 flex items-center justify-center overflow-hidden cursor-pointer hover:border-cyan-500 transition-colors relative group ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
                                 onClick={() => fileInputRef.current?.click()}
                             >
-                                {formData.imageUrl ? (
+                                {isUploading ? (
+                                    <LoadingSpinnerIcon />
+                                ) : formData.imageUrl ? (
                                     <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
                                 ) : (
-                                    <UploadIcon className="w-8 h-8 text-gray-500" />
+                                    <UploadIcon className="w-6 h-6 text-gray-500" />
                                 )}
-                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                    <span className="text-xs font-bold text-white">Change</span>
-                                </div>
+                                {!isUploading && (
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">Change</span>
+                                    </div>
+                                )}
                             </div>
                             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                         </div>
-                        <div className="flex-grow space-y-4">
+                        <div className="flex-grow space-y-3">
                             <Input label="Name" name="name" value={formData.name} onChange={handleChange} required />
                             <Input label="Role / Title" name="role" value={formData.role} onChange={handleChange} required placeholder="e.g. Lead Engineer" />
                             
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-300">Member Categories</label>
-                                <div className="flex gap-4">
+                            <div className="space-y-1">
+                                <label className="block text-xs font-medium text-gray-300">Member Categories</label>
+                                <div className="flex gap-3">
                                     {['Team', 'Artist'].map((cat) => (
                                         <label key={cat} className="flex items-center gap-2 cursor-pointer group">
                                             <input 
                                                 type="checkbox" 
                                                 checked={formData.categories.includes(cat as any)} 
                                                 onChange={() => handleCategoryChange(cat as any)}
-                                                className="w-4 h-4 bg-gray-800 border-gray-700 rounded text-cyan-500 focus:ring-cyan-500"
+                                                className="w-3 h-3 bg-gray-800 border-gray-700 rounded text-cyan-500 focus:ring-cyan-500"
                                             />
-                                            <span className="text-sm text-gray-400 group-hover:text-white transition-colors">{cat}</span>
+                                            <span className="text-xs text-gray-400 group-hover:text-white transition-colors">{cat}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -136,13 +147,13 @@ const MemberFormModal: React.FC<{
                         </div>
                     </div>
                     
-                    <Textarea label="Bio" name="bio" value={formData.bio} onChange={handleChange} required rows={4} />
+                    <Textarea label="Bio" name="bio" value={formData.bio} onChange={handleChange} required rows={3} />
                     <Input label="Expertise / Genres (Comma separated)" name="expertiseInput" value={expertiseInput} onChange={(e) => setExpertiseInput(e.target.value)} placeholder="Mixing, Hip-Hop, Sound Design" />
 
-                    <div className="flex justify-end gap-3 pt-4">
-                        <button type="button" onClick={onClose} className="px-4 py-2 rounded-full text-gray-300 hover:bg-gray-800">Cancel</button>
-                        <button type="submit" disabled={isSaving || !formData.imageUrl} className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-bold rounded-full hover:scale-105 disabled:opacity-50">
-                            {isSaving ? <LoadingSpinnerIcon /> : 'Save Profile'}
+                    <div className="flex justify-end gap-2 pt-3">
+                        <button type="button" onClick={onClose} className="px-4 py-1.5 rounded-full text-xs text-gray-300 hover:bg-gray-800">Cancel</button>
+                        <button type="submit" disabled={isSaving || isUploading || !formData.imageUrl} className="px-5 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-black text-xs font-bold rounded-full hover:scale-105 disabled:opacity-50">
+                            {isSaving ? <LoadingSpinnerIcon className="w-3 h-3" /> : 'Save Profile'}
                         </button>
                     </div>
                 </form>
@@ -253,18 +264,17 @@ export const TeamManager: React.FC<TeamManagerProps> = ({ addToast }) => {
 
     return (
         <section>
-            <div className="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold uppercase tracking-widest text-white">Team & Artists</h2>
-                    <p className="text-gray-400 mt-1">Manage bios, photos, and roster for the Team page.</p>
-                </div>
-                <div className="flex gap-4">
-                     <div className="flex bg-gray-800 rounded-full p-1 border border-gray-700">
+            <div className="flex flex-col items-center justify-center text-center mb-6">
+                <h2 className="text-lg font-bold uppercase tracking-widest text-white">Team & Artists</h2>
+                <p className="text-gray-400 mt-0.5 text-[10px]">Manage bios, photos, and roster for the Team page.</p>
+                
+                <div className="mt-4 flex flex-col items-center gap-3">
+                     <div className="flex bg-gray-800 rounded-full p-0.5 border border-gray-700">
                         {(['All', 'Team', 'Artist'] as const).map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`px-4 py-1.5 rounded-full text-sm font-bold transition-colors ${
+                                className={`px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors ${
                                     filter === f 
                                     ? 'bg-fuchsia-600 text-white' 
                                     : 'text-gray-400 hover:text-white'
@@ -276,7 +286,7 @@ export const TeamManager: React.FC<TeamManagerProps> = ({ addToast }) => {
                     </div>
                     <button 
                         onClick={() => { setEditingMember(undefined); setIsModalOpen(true); }}
-                        className="px-6 py-2 bg-gradient-to-r from-fuchsia-500 to-pink-500 text-black font-bold rounded-full hover:scale-105 whitespace-nowrap"
+                        className="px-4 py-1.5 bg-gradient-to-r from-fuchsia-500 to-pink-500 text-black text-[10px] font-bold uppercase tracking-wider rounded-full hover:scale-105 whitespace-nowrap shadow-lg shadow-fuchsia-500/20"
                     >
                         + Add Member
                     </button>
@@ -284,14 +294,14 @@ export const TeamManager: React.FC<TeamManagerProps> = ({ addToast }) => {
             </div>
 
             {filter !== 'All' && (
-                <div className="mb-4 text-center">
-                    <p className="text-xs text-yellow-500 bg-yellow-900/20 border border-yellow-500/20 inline-block px-3 py-1 rounded">
+                <div className="mb-3 text-center">
+                    <p className="text-[9px] text-yellow-500 bg-yellow-900/20 border border-yellow-500/20 inline-block px-2 py-0.5 rounded uppercase tracking-wider">
                         Note: Drag-and-drop reordering is disabled while list is filtered. Switch to 'All' to reorder.
                     </p>
                 </div>
             )}
 
-            <div className="space-y-3">
+            <div className="space-y-1.5">
                 {filteredMembers.map((member, index) => (
                     <div 
                         key={member.id}
@@ -300,33 +310,35 @@ export const TeamManager: React.FC<TeamManagerProps> = ({ addToast }) => {
                         onDragEnter={(e) => handleDragEnter(e, index)}
                         onDragOver={handleDragOver}
                         onDragEnd={handleDragEnd}
-                        className={`bg-gray-800/50 border rounded-lg p-4 flex gap-4 transition-all duration-300 group relative
+                        className={`bg-gray-800/50 border rounded-lg p-2 flex gap-2 transition-all duration-300 group relative items-center
                             ${dragOverIndex === index ? 'border-fuchsia-400 bg-gray-800 scale-[1.01]' : 'border-gray-700 hover:border-cyan-500/50'}
                             ${draggingIndex === index ? 'opacity-40' : 'opacity-100'}
                             ${filter !== 'All' ? 'cursor-default' : 'cursor-move'}
                         `}
                     >
                         {filter === 'All' && (
-                            <div className="text-gray-500 hover:text-white self-center p-2 cursor-grab active:cursor-grabbing">
-                                <DragHandleIcon className="w-5 h-5" />
+                            <div className="text-gray-500 hover:text-white self-center p-0.5 cursor-grab active:cursor-grabbing">
+                                <DragHandleIcon className="w-3 h-3" />
                             </div>
                         )}
-                        <img src={member.imageUrl} alt={member.name} className="w-16 h-16 rounded-full object-cover border-2 border-gray-600 flex-shrink-0" loading="lazy" />
+                        <img src={member.imageUrl} alt={member.name} className="w-10 h-10 rounded-full object-cover border border-gray-600 flex-shrink-0" loading="lazy" />
                         <div className="flex-grow min-w-0 flex flex-col justify-center">
-                            <h4 className="font-bold text-white truncate">{member.name}</h4>
-                            <div className="flex items-center gap-2 text-xs mb-1">
+                            <div className="flex items-center gap-1.5">
+                                <h4 className="font-bold text-white truncate text-xs">{member.name}</h4>
+                                <span className="text-gray-500 text-[10px]">• {member.role}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[9px] mt-0.5">
                                 <div className="flex gap-1">
                                     {member.categories.map(cat => (
-                                        <span key={cat} className={`px-2 py-0.5 rounded-full ${cat === 'Team' ? 'bg-cyan-900 text-cyan-200' : 'bg-fuchsia-900 text-fuchsia-200'}`}>{cat}</span>
+                                        <span key={cat} className={`px-1 py-0 rounded-full ${cat === 'Team' ? 'bg-cyan-900/50 text-cyan-200' : 'bg-fuchsia-900/50 text-fuchsia-200'}`}>{cat}</span>
                                     ))}
                                 </div>
-                                <span className="text-gray-400 truncate">• {member.role}</span>
+                                <span className="text-gray-600 truncate hidden sm:inline">| {member.expertise.slice(0, 3).join(', ')}</span>
                             </div>
-                            <p className="text-xs text-gray-500 truncate">{member.expertise.slice(0, 3).join(', ')}</p>
                         </div>
-                        <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity justify-center ml-auto">
-                            <button onClick={() => { setEditingMember(member); setIsModalOpen(true); }} className="text-gray-400 hover:text-cyan-400 p-2" title="Edit"><EditIcon className="w-5 h-5" /></button>
-                            <button onClick={() => handleDelete(member.id)} className="text-gray-400 hover:text-red-400 p-2" title="Delete"><CloseIcon /></button>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
+                            <button onClick={() => { setEditingMember(member); setIsModalOpen(true); }} className="text-gray-400 hover:text-cyan-400 p-1 hover:bg-gray-700 rounded-full transition-colors" title="Edit"><EditIcon className="w-3 h-3" /></button>
+                            <button onClick={() => handleDelete(member.id)} className="text-gray-400 hover:text-red-400 p-1 hover:bg-gray-700 rounded-full transition-colors" title="Delete"><CloseIcon className="w-3 h-3" /></button>
                         </div>
                     </div>
                 ))}

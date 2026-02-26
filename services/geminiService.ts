@@ -125,7 +125,17 @@ const createStudioBookingFunctionDeclaration: FunctionDeclaration = {
 
 // --- Initialization ---
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+let ai: GoogleGenAI | null = null;
+try {
+  const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+  if (apiKey) {
+    ai = new GoogleGenAI({ apiKey: apiKey as string });
+  } else {
+    console.warn("Gemini API key is missing. Chatbot will not function correctly.");
+  }
+} catch (e) {
+  console.error("Failed to initialize Gemini API:", e);
+}
 
 // --- Logic Handlers ---
 
@@ -167,6 +177,11 @@ const handleCreateStudioBooking = async (args: any) => {
 // --- Main Chat Function ---
 
 export const startChat = async (history: History[]): Promise<any> => {
+  if (!ai) {
+    console.error('Gemini API is not initialized. Check your API key.');
+    return { text: 'I am currently offline. Please check the system configuration.' };
+  }
+
   try {
     const lastMessage = history[history.length - 1];
     const historyForApi = history.slice(0, -1);
@@ -238,6 +253,10 @@ export const startChat = async (history: History[]): Promise<any> => {
 };
 
 export const generateStudioImage = async (prompt: string): Promise<string> => {
+  if (!ai) {
+    throw new Error("Gemini API is not initialized.");
+  }
+
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
     contents: { parts: [{ text: prompt }] },

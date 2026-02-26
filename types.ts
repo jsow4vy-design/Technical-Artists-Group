@@ -75,3 +75,14 @@ export interface FeaturedSession {
   mediaUrl: string;
   mediaType: 'audio' | 'video';
 }
+
+export interface GallerySession {
+  id: number;
+  artist: string;
+  type: 'image' | 'video';
+  description: string;
+  images: string[];
+  rotation: number;
+  widthClass: string;
+  zIndex: string;
+}

@@ -1,141 +1,133 @@
-
-import React, { useState, useRef, useEffect } from 'react';
-import { BackIcon, CheckIcon, CloseIcon } from './icons';
-import { featuredSessions as defaultFeaturedSessions } from '../data/studioData';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { FeaturedSessionsManager } from './admin/FeaturedSessionsManager';
-import { DataTable } from './admin/DataTable';
-import { TeamManager } from './admin/TeamManager';
+import React, { useState } from 'react';
+import { CloseIcon } from './icons';
+import { MediaManager } from './admin/MediaManager';
 import { GalleryManager } from './admin/GalleryManager';
-import { LogoManager } from './admin/LogoManager';
-import { blueprintStyleAdmin } from '../styles/common';
-import type { DataItem, FeaturedSession } from '../types';
+import { TeamManager } from './admin/TeamManager';
+import { FeaturedSessionsManager } from './admin/FeaturedSessionsManager';
 
-type BookingStatus = 'Pending' | 'Contacted' | 'Paid';
-type AdminTab = 'submissions' | 'content' | 'roster';
+// ============================================================================
+// Types & Interfaces
+// ============================================================================
 
-interface Toast {
-  id: number;
-  message: string;
-  isExiting?: boolean;
+interface AdminDashboardProps {
+  onBack: () => void;
 }
 
-const Toast: React.FC<{ message: string; isExiting?: boolean; onClose: () => void; }> = ({ message, isExiting, onClose }) => {
-  return (
-    <div role="status" className={`flex items-center gap-4 w-full max-w-sm p-4 text-white bg-green-600/50 backdrop-blur-lg border border-green-500/30 rounded-lg shadow-lg ${isExiting ? 'animate-toast-out-right' : 'animate-toast-in-right'}`}>
-      <CheckIcon className="w-6 h-6 flex-shrink-0" />
-      <div className="flex-grow text-sm font-semibold">{message}</div>
-      <button onClick={onClose} aria-label="Close" className="p-1 rounded-full hover:bg-white/20"><CloseIcon /></button>
-    </div>
-  );
-};
+type AdminTab = 'media' | 'gallery' | 'team' | 'featured';
 
-const bookingStatusStyles: { [key in BookingStatus]: string } = {
-    Pending: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    Contacted: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
-    Paid: 'bg-green-500/20 text-green-400 border-green-500/30',
-};
+// ============================================================================
+// Main Component
+// ============================================================================
 
-const AdminDashboard: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [bookings, setBookings] = useLocalStorage<DataItem[]>('underla_bookings', []);
-  // Added FeaturedSession[] generic to useLocalStorage to fix mediaType inference
-  const [featuredSessions, setFeaturedSessions] = useLocalStorage<FeaturedSession[]>('underla_featured_sessions', defaultFeaturedSessions);
-  const [studioName] = useLocalStorage<string>('tag_studio_name', 'UNDR:LA Studios');
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const [activeTab, setActiveTab] = useState<AdminTab>('submissions');
+/**
+ * Admin Dashboard Component.
+ * Central hub for managing all aspects of the studio website.
+ */
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
+  const [activeTab, setActiveTab] = useState<AdminTab>('media');
+  const [toasts, setToasts] = useState<{ id: number; message: string }[]>([]);
   
-  const headerRef = useRef<HTMLElement>(null);
-  const [headerHeight, setHeaderHeight] = useState(0);
-
-  useEffect(() => {
-    if (headerRef.current) setHeaderHeight(headerRef.current.offsetHeight);
-  }, []);
-
+  /**
+   * Adds a temporary toast message to the screen.
+   */
   const addToast = (message: string) => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message }]);
-    setTimeout(() => removeToast(id), 5000);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 3000);
   };
 
-  const removeToast = (id: number) => {
-    setToasts(prev => prev.map(t => t.id === id ? { ...t, isExiting: true } : t));
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 500);
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'media':
+        return <MediaManager addToast={addToast} />;
+      case 'gallery':
+        return <GalleryManager addToast={addToast} />;
+      case 'team':
+        return <TeamManager addToast={addToast} />;
+      case 'featured':
+        return <FeaturedSessionsManager addToast={addToast} />;
+      default:
+        return <MediaManager addToast={addToast} />;
+    }
   };
 
-  const handleBookingStatusChange = (bookingId: number, newStatus: BookingStatus) => {
-    setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
-    addToast(`Booking status updated to ${newStatus}.`);
-  };
-
-  const TabButton: React.FC<{ tabId: AdminTab; children: React.ReactNode }> = ({ tabId, children }) => (
-    <button
-      onClick={() => setActiveTab(tabId)}
-      role="tab"
-      aria-selected={activeTab === tabId}
-      className={`px-6 py-3 font-semibold uppercase tracking-wider text-sm transition-colors border-b-2 ${
-        activeTab === tabId
-          ? 'border-cyan-400 text-cyan-400'
-          : 'border-transparent text-gray-400 hover:text-white hover:border-gray-500'
-      }`}
-    >
-      {children}
-    </button>
-  );
+  const tabs: { id: AdminTab; label: string }[] = [
+    { id: 'media', label: 'Media Library' },
+    { id: 'gallery', label: 'Galleries' },
+    { id: 'team', label: 'Team & Artists' },
+    { id: 'featured', label: 'Studio Showcase' },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#111] text-white animate-fade-in" style={blueprintStyleAdmin}>
-      <div className="fixed top-24 right-8 z-50 w-full max-w-sm space-y-2">
-        {toasts.map(toast => <Toast key={toast.id} {...toast} onClose={() => removeToast(toast.id)} />)}
+    <div className="min-h-screen bg-black text-white flex flex-col">
+      {/* Toast Notifications */}
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+        {toasts.map(toast => (
+          <div key={toast.id} className="bg-fuchsia-600 text-white px-6 py-3 rounded-lg shadow-2xl animate-fade-in-up font-bold tracking-wide pointer-events-auto">
+            {toast.message}
+          </div>
+        ))}
       </div>
-      <header ref={headerRef} className="p-8 flex items-center justify-between fixed top-0 left-0 right-0 bg-[#111]/80 backdrop-blur-sm z-40">
-        <div>
-          <h1 className="text-4xl font-bold uppercase tracking-widest text-white">Admin Dashboard</h1>
-          <p className="text-gray-400">Managing {studioName}</p>
+
+      {/* Header & Navigation */}
+      <header className="bg-[#050505] border-b border-white/10 sticky top-0 z-40">
+        <div className="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
+            <div className="flex items-center gap-6">
+                <button 
+                    onClick={onBack}
+                    className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors border border-white/5"
+                    title="Back to Site"
+                >
+                    <CloseIcon className="w-5 h-5 text-gray-400" />
+                </button>
+            </div>
+
+            <div className="text-center">
+                <h1 className="text-lg font-black uppercase tracking-[0.2em] text-white">
+                    Command Center
+                </h1>
+                <p className="text-[9px] font-mono text-fuchsia-500 uppercase tracking-widest">
+                    Admin Access Granted
+                </p>
+            </div>
+
+            <nav className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/5">
+                {tabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                            activeTab === tab.id 
+                                ? 'bg-fuchsia-600 text-white shadow-lg shadow-fuchsia-500/20' 
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </nav>
+            
+            {/* Mobile Menu Placeholder (if needed) */}
+            <div className="md:hidden">
+                <select 
+                    value={activeTab} 
+                    onChange={(e) => setActiveTab(e.target.value as AdminTab)}
+                    className="bg-gray-900 text-white border border-gray-700 rounded-lg px-4 py-2 text-sm uppercase font-bold focus:outline-none focus:border-fuchsia-500"
+                >
+                    {tabs.map(tab => (
+                        <option key={tab.id} value={tab.id}>{tab.label}</option>
+                    ))}
+                </select>
+            </div>
         </div>
-        <button onClick={onBack} className="flex items-center space-x-2 text-gray-300 hover:text-[#00ffff] transition-colors p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400">
-          <BackIcon />
-          <span>Back to Site</span>
-        </button>
       </header>
 
-      <main className="p-8" style={{ paddingTop: `${headerHeight}px` }}>
-        <div role="tablist" className="flex justify-center border-b border-gray-700/50 mb-12">
-            <TabButton tabId="submissions">Submissions</TabButton>
-            <TabButton tabId="roster">Team Roster</TabButton>
-            <TabButton tabId="content">Site Content</TabButton>
-        </div>
-        
-        <div className="animate-fade-in max-w-6xl mx-auto">
-          {activeTab === 'submissions' && (
-            <div role="tabpanel" className="max-w-5xl mx-auto">
-              <DataTable
-                  title="Studio Bookings"
-                  items={bookings}
-                  setItems={setBookings}
-                  statusOptions={['Pending', 'Contacted', 'Paid']}
-                  statusStyles={bookingStatusStyles}
-                  brandColorClass="fuchsia"
-                  onStatusChange={(id, status) => handleBookingStatusChange(id, status as BookingStatus)}
-                  addToast={addToast}
-              />
-            </div>
-          )}
-          
-          {activeTab === 'roster' && (
-             <div role="tabpanel">
-                <TeamManager addToast={addToast} />
-             </div>
-          )}
-
-          {activeTab === 'content' && (
-             <div role="tabpanel" className="space-y-16">
-                <LogoManager addToast={addToast} />
-                <hr className="border-gray-800" />
-                <GalleryManager addToast={addToast} />
-                <hr className="border-gray-800" />
-                <FeaturedSessionsManager sessions={featuredSessions} setSessions={setFeaturedSessions} addToast={addToast} />
-             </div>
-          )}
+      {/* Main Content Area */}
+      <main className="flex-grow bg-[#0a0a0a] p-6 md:p-10 overflow-y-auto">
+        <div className="max-w-[1600px] mx-auto animate-fade-in">
+            {renderActiveTab()}
         </div>
       </main>
     </div>

@@ -163,7 +163,7 @@ const TeamPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <header className={`flex flex-col lg:flex-row lg:items-end justify-between gap-8 transition-all duration-1000 ${!isLoading ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                         <div>
                             <p className="text-fuchsia-500 text-xs font-black uppercase tracking-[0.6em] mb-4">Discovery Engine</p>
-                            <h2 className="text-4xl md:text-5xl font-bold text-white uppercase tracking-tighter">Explore the Collective</h2>
+                            <h2 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tighter">Explore the Collective</h2>
                         </div>
                         
                         <div className="relative w-full lg:max-w-sm group">
@@ -249,7 +249,7 @@ const TeamPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-16 py-32 items-center">
                         <div className="space-y-8 text-center md:text-left">
-                            <h2 className="text-4xl md:text-5xl font-bold text-white uppercase tracking-tighter leading-none">
+                            <h2 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tighter leading-none">
                                 Your Vision. <br />
                                 <span className="text-fuchsia-500">Our Experts.</span>
                             </h2>
