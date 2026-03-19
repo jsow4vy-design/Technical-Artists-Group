@@ -131,7 +131,7 @@ Time: ${time}`;
         role="dialog"
         aria-modal="true"
         aria-labelledby="chat-header"
-        className={`fixed bottom-0 right-0 sm:m-6 bg-black/60 bg-gradient-to-b from-white/10 to-transparent backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl w-full h-full sm:w-[380px] sm:h-[580px] flex flex-col transition-all duration-300 ease-in-out z-50 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
+        className={`fixed bottom-0 right-0 sm:m-6 bg-black/60 bg-gradient-to-b from-white/10 to-transparent backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl w-full h-full sm:w-[320px] sm:h-[480px] flex flex-col transition-all duration-300 ease-in-out z-50 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
       >
         <header className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5 rounded-t-2xl">
           <div className="flex items-center gap-3">

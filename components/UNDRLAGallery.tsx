@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { CloseIcon, PlayIcon, PauseIcon, UsersIcon, SkipBackIcon, SkipForwardIcon, ChevronDownIcon } from './icons';
-import { studioFaqs, featuredSessions as defaultFeaturedSessions, studioTeam } from '../data/studioData';
+import { CloseIcon, PlayIcon, PauseIcon, SkipBackIcon, SkipForwardIcon, ChevronDownIcon } from './icons';
+import { studioFaqs, featuredSessions as defaultFeaturedSessions } from '../data/studioData';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Modal } from './common/Modal';
 import { GalleryLayout } from '../layouts/GalleryLayout';
@@ -9,6 +9,7 @@ import { BookingForm } from './BookingForm';
 import { blueprintStyleFuchsia } from '../styles/common';
 import type { FeaturedSession, GallerySession } from '../types';
 import SEO from './SEO';
+import { motion } from 'motion/react';
 
 // ============================================================================
 // Types & Interfaces
@@ -110,10 +111,13 @@ const CollageItem: React.FC<{ session: GallerySession; index: number; className?
     }, [session.images.length, index]);
 
     return (
-        <article 
+        <motion.article 
+            initial={{ opacity: 0, y: 50, rotate: session.rotation - 10 }}
+            whileInView={{ opacity: 1, y: 0, rotate: session.rotation }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.8, delay: index * 0.1, ease: "easeOut" }}
             className={`transition-all duration-1000 ${className}`}
             style={{ 
-                transform: `rotate(${session.rotation}deg)`,
                 perspective: '1500px'
             }}
         >
@@ -130,6 +134,7 @@ const CollageItem: React.FC<{ session: GallerySession; index: number; className?
                             key={idx}
                             src={img}
                             alt=""
+                            loading="lazy"
                             className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 grayscale group-hover:grayscale-0 ${
                                 idx === currentImageIdx ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
                             }`}
@@ -147,7 +152,7 @@ const CollageItem: React.FC<{ session: GallerySession; index: number; className?
                     </p>
                 </div>
             </div>
-        </article>
+        </motion.article>
     );
 };
 
@@ -157,7 +162,12 @@ const CollageItem: React.FC<{ session: GallerySession; index: number; className?
 const FaqItem: React.FC<{ faq: { id: number; question: string; answer: string }; index: number }> = ({ faq, index }) => {
     const [isOpen, setIsOpen] = useState(false);
     return (
-        <div className="animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-20px" }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+        >
             <div className={`group relative bg-white/[0.02] rounded-2xl border transition-all duration-500 overflow-hidden ${
                 isOpen ? 'border-fuchsia-500/50 bg-white/[0.05]' : 'border-white/5 hover:border-white/10'
             }`}>
@@ -171,7 +181,7 @@ const FaqItem: React.FC<{ faq: { id: number; question: string; answer: string };
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -283,7 +293,13 @@ const StudioShowcasePlayer: React.FC<{ playlist: FeaturedSession[] }> = ({ playl
     const progressPercent = duration ? (currentTime / duration) * 100 : 0;
 
     return (
-        <div className="bg-[#0a0a0a] rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col lg:flex-row max-w-7xl mx-auto shadow-2xl">
+        <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6 }}
+            className="bg-[#0a0a0a] rounded-[2.5rem] border border-white/5 overflow-hidden flex flex-col lg:flex-row max-w-7xl mx-auto shadow-2xl"
+        >
             <div className="flex-grow p-12 flex flex-col items-center justify-center bg-gradient-to-br from-black to-[#111] relative">
                 {/* Header/Badge */}
                 <div className="absolute top-8 left-8 flex items-center gap-2">
@@ -368,7 +384,7 @@ const StudioShowcasePlayer: React.FC<{ playlist: FeaturedSession[] }> = ({ playl
                     ))}
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -384,7 +400,7 @@ const StudioShowcasePlayer: React.FC<{ playlist: FeaturedSession[] }> = ({ playl
  * Main Gallery Page Component.
  * Displays the visual journal, resident personnel, and studio showcase.
  */
-const UNDRLAGallery: React.FC<{ onBack: () => void; onViewTeam: () => void }> = ({ onBack, onViewTeam }) => {
+const UNDRLAGallery: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [featuredSessions] = useLocalStorage<FeaturedSession[]>('underla_featured_sessions', defaultFeaturedSessions);
   const [studioName] = useLocalStorage<string>('tag_studio_name', 'UNDR:LA Studios');
   const [gallerySessions, setGallerySessions] = useState<GallerySession[]>([]);
@@ -413,7 +429,7 @@ const UNDRLAGallery: React.FC<{ onBack: () => void; onViewTeam: () => void }> = 
         <SEO title="Studio Experience" description={`Immersive snapshots and sonic breakthroughs at ${studioName}.`} />
 
         <section className="relative px-6 py-32 max-w-[1400px] mx-auto overflow-hidden">
-            <div className="flex flex-col lg:flex-row justify-between items-start mb-32 gap-12 relative z-[70]">
+            <div className="flex flex-col lg:flex-row justify-between items-start mb-16 gap-12 relative z-[70]">
                 <header className="max-w-xl">
                     <p className="text-fuchsia-500 text-xs font-black uppercase tracking-[0.8em] mb-4">Underground Archives</p>
                     <h2 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tighter mb-6 whitespace-nowrap">
@@ -430,7 +446,7 @@ const UNDRLAGallery: React.FC<{ onBack: () => void; onViewTeam: () => void }> = 
                     {gallerySessions.map((session, index) => (
                         <div 
                             key={session.id} 
-                            className={`relative transition-all duration-500 hover:z-[100] hover:scale-105 ${index !== 0 ? '-ml-16 lg:-ml-24' : ''}`}
+                            className={`relative transition-all duration-500 hover:z-[100] ${index !== 0 ? '-ml-8 lg:-ml-12' : ''}`}
                             style={{ zIndex: 50 - index }}
                         >
                             <CollageItem 
@@ -444,35 +460,11 @@ const UNDRLAGallery: React.FC<{ onBack: () => void; onViewTeam: () => void }> = 
             </div>
         </section>
 
-        <section className="py-40 bg-[#050505] border-y border-white/5">
-            <div className="max-w-7xl mx-auto px-6 flex flex-col items-center text-center">
-                <div className="mb-12 relative cursor-pointer group" onClick={onViewTeam}>
-                    <div className="absolute inset-0 bg-fuchsia-500/20 blur-3xl animate-pulse"></div>
-                    <UsersIcon className="w-16 h-16 text-white relative z-10 group-hover:scale-110 transition-transform" />
-                </div>
-                <h2 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tighter mb-6 cursor-pointer hover:text-fuchsia-400 transition-colors" onClick={onViewTeam}>Resident Personnel</h2>
-                <p className="text-gray-500 text-xl max-w-2xl mb-16">Collaborate with the world-class engineers and visionary artists that define our sonic fingerprint.</p>
-                
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 w-full mb-16">
-                    {studioTeam.slice(0, 5).map((member) => (
-                        <div key={member.id} className="group relative bg-[#0a0a0a] rounded-2xl overflow-hidden border border-white/5 hover:border-fuchsia-500/40 transition-all duration-500 cursor-pointer" onClick={onViewTeam}>
-                            <div className="aspect-square relative overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent z-10 opacity-90 group-hover:opacity-40 transition-opacity duration-500"></div>
-                                <img src={member.imageUrl} alt={member.name} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" loading="lazy" />
-                            </div>
-                            <div className="absolute bottom-0 left-0 right-0 p-4 z-20 text-left transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                                <h4 className="text-white font-bold text-sm uppercase tracking-tight truncate">{member.name}</h4>
-                                <p className="text-fuchsia-500 text-[9px] font-black uppercase tracking-widest truncate mt-1">{member.role.split('&')[0]}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <button onClick={onViewTeam} className="text-xs font-black uppercase tracking-[0.4em] text-fuchsia-500 border-b-2 border-fuchsia-500 pb-2 hover:tracking-[0.6em] transition-all">View Full Roster</button>
-            </div>
-        </section>
-
         <section className="py-40 px-6">
+            <div className="max-w-7xl mx-auto mb-16 text-center">
+                <p className="text-fuchsia-500 text-[10px] font-black uppercase tracking-[0.6em] mb-4">Sonic Showcase</p>
+                <h2 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-widest">The Soundboard</h2>
+            </div>
             <StudioShowcasePlayer playlist={featuredSessions} />
         </section>
 

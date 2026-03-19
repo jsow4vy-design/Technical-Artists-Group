@@ -110,7 +110,7 @@ app.get('/api/media', async (req: Request, res: Response) => {
  * Deletes a specific media file.
  */
 app.delete('/api/media/:filename', async (req: Request, res: Response) => {
-  const filename = req.params.filename;
+  const filename = req.params.filename as string;
   const filePath = path.join(UPLOADS_DIR, filename);
   
   try {
@@ -143,7 +143,7 @@ app.post('/api/gallery', async (req: Request, res: Response) => {
 });
 
 app.put('/api/gallery/:id', async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   const updatedItem = req.body;
   const data = await readJsonData(GALLERY_DATA_PATH);
   const index = data.findIndex((item: any) => item.id === id);
@@ -157,66 +157,12 @@ app.put('/api/gallery/:id', async (req: Request, res: Response) => {
 });
 
 app.delete('/api/gallery/:id', async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   let data = await readJsonData(GALLERY_DATA_PATH);
   const initialLength = data.length;
   data = data.filter((item: any) => item.id !== id);
   if (data.length !== initialLength) {
     await writeJsonData(GALLERY_DATA_PATH, data);
-    res.json({ success: true });
-  } else {
-    res.status(404).json({ error: 'Item not found' });
-  }
-});
-
-// --- Team Routes ---
-
-app.get('/api/team', async (req: Request, res: Response) => {
-  const data = await readJsonData(TEAM_DATA_PATH);
-  res.json(data);
-});
-
-app.post('/api/team', async (req: Request, res: Response) => {
-  const newItem = req.body;
-  const data = await readJsonData(TEAM_DATA_PATH);
-  const newId = Date.now(); // Use timestamp for ID to avoid collisions
-  const itemWithId = { ...newItem, id: newId };
-  data.push(itemWithId);
-  await writeJsonData(TEAM_DATA_PATH, data);
-  res.json(itemWithId);
-});
-
-app.put('/api/team/:id', async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  const updatedItem = req.body;
-  const data = await readJsonData(TEAM_DATA_PATH);
-  const index = data.findIndex((item: any) => item.id === id);
-  if (index !== -1) {
-    data[index] = { ...data[index], ...updatedItem, id };
-    await writeJsonData(TEAM_DATA_PATH, data);
-    res.json(data[index]);
-  } else {
-    res.status(404).json({ error: 'Item not found' });
-  }
-});
-
-app.put('/api/team', async (req: Request, res: Response) => {
-    // Bulk update for reordering
-    const items = req.body;
-    if (!Array.isArray(items)) {
-        return res.status(400).json({ error: 'Expected an array of items' });
-    }
-    await writeJsonData(TEAM_DATA_PATH, items);
-    res.json({ success: true });
-});
-
-app.delete('/api/team/:id', async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  let data = await readJsonData(TEAM_DATA_PATH);
-  const initialLength = data.length;
-  data = data.filter((item: any) => item.id !== id);
-  if (data.length !== initialLength) {
-    await writeJsonData(TEAM_DATA_PATH, data);
     res.json({ success: true });
   } else {
     res.status(404).json({ error: 'Item not found' });
@@ -241,7 +187,7 @@ app.post('/api/featured-sessions', async (req: Request, res: Response) => {
 });
 
 app.put('/api/featured-sessions/:id', async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   const updatedItem = req.body;
   const data = await readJsonData(FEATURED_SESSIONS_DATA_PATH);
   const index = data.findIndex((item: any) => item.id === id);
@@ -265,7 +211,7 @@ app.put('/api/featured-sessions', async (req: Request, res: Response) => {
 });
 
 app.delete('/api/featured-sessions/:id', async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id as string);
   let data = await readJsonData(FEATURED_SESSIONS_DATA_PATH);
   const initialLength = data.length;
   data = data.filter((item: any) => item.id !== id);

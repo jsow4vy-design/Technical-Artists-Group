@@ -180,3 +180,60 @@ export const featuredSessions: FeaturedSession[] = [
         mediaType: 'video'
       }
   ];
+
+export const portfolioProjects = [
+    {
+        id: 1,
+        title: "Echoes of the Valley",
+        client: "The Wandering Souls",
+        service: "Recording & Production",
+        category: "Recording",
+        imageUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop",
+        description: "A full-length acoustic album recorded entirely in our main live room using vintage ribbon microphones."
+    },
+    {
+        id: 2,
+        title: "Neon Pulse",
+        client: "Static Bloom",
+        service: "Mixing & Mastering",
+        category: "Mixing",
+        imageUrl: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=800&auto=format&fit=crop",
+        description: "High-energy rock production focused on punchy drums and wide, aggressive guitar layers."
+    },
+    {
+        id: 3,
+        title: "Midnight Sessions",
+        client: "j.wav",
+        service: "Production & Sound Design",
+        category: "Production",
+        imageUrl: "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=800&auto=format&fit=crop",
+        description: "An experimental electronic EP utilizing our extensive collection of analog synthesizers."
+    },
+    {
+        id: 4,
+        title: "The Tech Unfiltered",
+        client: "Global Media Group",
+        service: "Podcasting",
+        category: "Podcast",
+        imageUrl: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=800&auto=format&fit=crop",
+        description: "Weekly video podcast series recorded with a 3-camera 4K setup and broadcast-grade audio."
+    },
+    {
+        id: 5,
+        title: "Urban Rhythms",
+        client: "Dee Strange",
+        service: "Vocal Production & Arrangement",
+        category: "Recording",
+        imageUrl: "https://images.unsplash.com/photo-1520529277867-dbf8c5e0b33a?q=80&w=800&auto=format&fit=crop",
+        description: "Specialized vocal sessions focusing on melodic rap flows and intricate vocal harmonies."
+    },
+    {
+        id: 6,
+        title: "Cinematic Soundscapes",
+        client: "Apex Film Works",
+        service: "Mastering",
+        category: "Mixing",
+        imageUrl: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=800&auto=format&fit=crop",
+        description: "Final mastering for a feature-length documentary, optimized for both theater and streaming."
+    }
+];

@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Input, Textarea } from './FormControls';
+import { Input, Textarea, Select } from './FormControls';
 import { studioPackages } from '../data/studioData';
 import { SubmissionSuccess } from './common/SubmissionSuccess';
 import { PolicyModal } from './UNDRLAGallery';
@@ -105,7 +105,7 @@ const BookingFormContent: React.FC = () => {
     
     const formRef = useRef<HTMLDivElement>(null);
 
-    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         dispatch({ 
             type: 'UPDATE_FORM', 
             field: e.target.name as any, 
@@ -239,7 +239,20 @@ const BookingFormContent: React.FC = () => {
                                         <Input label="Full Name" name="name" value={state.formData.name} onChange={handleFormChange} required placeholder="Moe White" disabled={isSubmitting} />
                                         <Input label="Email Address" type="email" name="email" value={state.formData.email} onChange={handleFormChange} required placeholder="artist@underla.studio" disabled={isSubmitting} />
                                         <Input label="Desired Date" type="date" name="date" value={state.formData.date} onChange={handleFormChange} required min={new Date().toISOString().split('T')[0]} disabled={isSubmitting} />
-                                        <Input label="Load-in Time" type="time" name="time" value={state.formData.time} onChange={handleFormChange} required disabled={isSubmitting} />
+                                        <Select 
+                                            label="Load-in Time" 
+                                            name="time" 
+                                            value={state.formData.time} 
+                                            onChange={handleFormChange as any} 
+                                            required 
+                                            disabled={isSubmitting}
+                                        >
+                                            <option value="" disabled className="bg-gray-900">Select a time block</option>
+                                            <option value="10:00 AM - 02:00 PM" className="bg-gray-900">10:00 AM - 02:00 PM</option>
+                                            <option value="02:00 PM - 06:00 PM" className="bg-gray-900">02:00 PM - 06:00 PM</option>
+                                            <option value="06:00 PM - 10:00 PM" className="bg-gray-900">06:00 PM - 10:00 PM</option>
+                                            <option value="10:00 PM - 02:00 AM" className="bg-gray-900">10:00 PM - 02:00 AM</option>
+                                        </Select>
                                     </div>
 
                                     <Textarea label="Project Vision & Special Requirements" name="projectDetails" value={state.formData.projectDetails} onChange={handleFormChange} placeholder="Tell us about the tracks you're recording, gear needs, or specific vibes you want to capture..." disabled={isSubmitting} />

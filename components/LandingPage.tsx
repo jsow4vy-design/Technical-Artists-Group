@@ -132,15 +132,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         description={`Experience the sound of ${studioName}. Los Angeles' premier underground recording and production studio.`}
       />
 
-      {/* FIXED TOP HEADER: Nav Only (Logo removed) */}
-      <header className={`fixed top-6 left-0 right-0 px-8 z-50 flex justify-end items-center transition-all duration-700 ease-out ${elementsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-        <nav className="hidden sm:flex gap-8 text-[10px] font-black uppercase tracking-[0.4em] text-white/40">
-           <span className="hover:text-fuchsia-500 cursor-pointer transition-colors">Studio</span>
-           <span className="hover:text-fuchsia-500 cursor-pointer transition-colors">Personnel</span>
-           <span className="hover:text-fuchsia-500 cursor-pointer transition-colors">Archive</span>
-        </nav>
-      </header>
-
       <section className="relative h-full w-full flex items-center justify-center overflow-hidden">
         
         {/* BACKGROUND LAYER 0: Video & Grid */}

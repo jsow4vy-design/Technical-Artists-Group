@@ -13,7 +13,6 @@ const Footer = lazy(() => import('./components/Footer'));
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 const AdminLoginPage = lazy(() => import('./components/AdminLoginPage'));
 const UNDRLAGallery = lazy(() => import('./components/UNDRLAGallery'));
-const TeamPage = lazy(() => import('./components/TeamPage'));
 
 // ============================================================================
 // Loader Component
@@ -30,7 +29,7 @@ const Loader: React.FC = () => (
 // ============================================================================
 const App: React.FC = () => {
   // --- State Management ---
-  type View = 'landing' | 'gallery' | 'adminLogin' | 'admin' | 'team';
+  type View = 'landing' | 'gallery' | 'adminLogin' | 'admin';
   const [view, setView] = useState<View>('landing');
   const [showFooter, setShowFooter] = useState(false);
 
@@ -50,16 +49,12 @@ const App: React.FC = () => {
     setView('gallery');
   };
 
-  const handleViewTeam = () => {
-    setView('team');
-  };
-
   // --- Effects ---
 
   // Effect: Footer visibility logic
   // Determines whether the footer should be shown based on the current view
   useEffect(() => {
-    const isGalleryView = view === 'gallery' || view === 'team';
+    const isGalleryView = view === 'gallery';
     setShowFooter(isGalleryView);
   }, [view]);
 
@@ -87,8 +82,6 @@ const App: React.FC = () => {
          if (view !== 'admin' && view !== 'adminLogin') navigateToAdminLogin();
       } else if (hash === '#studio') {
          if (view !== 'gallery') setView('gallery');
-      } else if (hash === '#team') {
-         if (view !== 'team') setView('team');
       }
     };
     
@@ -105,7 +98,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleScrollPosition = () => {
       const hash = window.location.hash;
-      if (hash && hash !== '#admin' && hash !== '#studio' && hash !== '#team') {
+      if (hash && hash !== '#admin' && hash !== '#studio') {
         // Scroll to specific section if hash exists and isn't a view route
         const id = hash.substring(1);
         const element = document.getElementById(id);
@@ -155,9 +148,7 @@ const App: React.FC = () => {
               </>
             );
         case 'gallery':
-            return <UNDRLAGallery onBack={handleBackToLanding} onViewTeam={handleViewTeam} />;
-        case 'team':
-            return <TeamPage onBack={handleBackToGallery} />;
+            return <UNDRLAGallery onBack={handleBackToLanding} />;
         default:
             setView('landing'); // Fallback
             return null;

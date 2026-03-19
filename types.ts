@@ -66,6 +66,16 @@ export interface TeamMember {
   expertise: string[];
 }
 
+export interface PortfolioProject {
+  id: number;
+  title: string;
+  client: string;
+  service: string;
+  category: string;
+  imageUrl: string;
+  description: string;
+}
+
 export interface FeaturedSession {
   id: number;
   artist: string;
